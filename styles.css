@@ -19,6 +19,16 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'BNazaninBold';
+    src: url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin-Bold.woff2') format('woff2'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin-Bold.woff') format('woff'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -219,10 +229,10 @@ input::placeholder {
     font-size: 1.1rem;
     color: #3f51b5;
     text-align: center;
-    font-family: 'BNazanin', Tahoma, Arial, sans-serif;
+    font-family: 'BNazaninBold', 'BNazanin', Tahoma, Arial, sans-serif;
     width: 100%;
     direction: rtl;
-    font-weight: bold; /* تغییر از normal به bold */
+    font-weight: 700; /* تغییر به بولدتر برای تاکید بیشتر */
     text-shadow: none;
 }
 
