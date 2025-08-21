@@ -1,9 +1,9 @@
 /* فونت‌های بهینه شده با پشتیبانی بهتر برای موبایل */
 @font-face {
     font-family: 'BTitr';
-    src: url('https://cdn.fontcdn.ir/Font/Persian/Titr/Titr.woff2') format('woff2'),
-         url('https://cdn.fontcdn.ir/Font/Persian/Titr/Titr.woff') format('woff'),
-         url('https://cdn.fontcdn.ir/Font/Persian/Titr/Titr.ttf') format('truetype');
+    src: url('https://cdn.fontcdn.ir/Font/Persian/Titr/BTitrBold.woff2') format('woff2'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Titr/BTitrBold.woff') format('woff'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Titr/BTitrBold.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -106,7 +106,7 @@ input::placeholder {
 }
 
 .primary-btn {
-    background-color: #4caf50; /* سبز کمرنگ */
+    background-color: #3a8a3f; /* سبز ملایم‌تر و تیره‌تر */
     color: white;
     font-size: 1.4rem; /* متن تبدیل بزرگتر شد */
     display: flex;
@@ -116,7 +116,7 @@ input::placeholder {
 }
 
 .primary-btn:hover {
-    background-color: #388e3c;
+    background-color: #2d6e31;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
@@ -163,21 +163,24 @@ input::placeholder {
     overflow: visible; /* تغییر به visible برای نمایش درست سایه */
 }
 
-/* استایل هدر مورب */
+/* استایل هدر مورب - راست‌چین و برعکس */
 .result-header {
     background-color: #546e7a;
     color: white;
     padding: 12px 15px;
     position: relative;
     text-align: right;
-    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+    width: 60%; /* حفظ عرض 60% */
+    margin-right: 0; /* چسبیدن به سمت راست */
+    margin-left: auto; /* فضای خالی در سمت چپ */
+    clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%); /* برعکس شدن مورب - از راست به چپ */
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .result-header h3 {
     font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1.2rem;
-    font-weight: normal;
+    font-weight: normal; /* تغییر از bold به normal */
     margin-right: 10px;
 }
 
@@ -213,14 +216,14 @@ input::placeholder {
 }
 
 .result-text {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: #3f51b5;
     text-align: center;
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
     width: 100%;
     direction: rtl;
-    font-weight: bold;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    font-weight: bold; /* تغییر از normal به bold */
+    text-shadow: none;
 }
 
 .hidden {
