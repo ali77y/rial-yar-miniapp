@@ -1,4 +1,3 @@
-// برقراری ارتباط با تلگرام
 const webapp = window.Telegram?.WebApp;
 if (webapp) {
     webapp.expand();
@@ -31,8 +30,24 @@ conversionTypeSelect.addEventListener('change', function() {
 // متغیر برای ذخیره مقدار عددی خالص
 let rawNumber = '';
 
+// تبدیل اعداد فارسی به انگلیسی
+function convertPersianToEnglishNumbers(input) {
+    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    
+    for (let i = 0; i < 10; i++) {
+        const regex = new RegExp(persianNumbers[i], 'g');
+        input = input.replace(regex, englishNumbers[i]);
+    }
+    
+    return input;
+}
+
 // اضافه کردن جداکننده هزارگان هنگام تایپ
 amountInput.addEventListener('input', function(e) {
+    // تبدیل اعداد فارسی به انگلیسی
+    this.value = convertPersianToEnglishNumbers(this.value);
+    
     // ذخیره موقعیت کرسر
     const start = this.selectionStart;
     const end = this.selectionEnd;
