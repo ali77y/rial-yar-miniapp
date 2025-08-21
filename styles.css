@@ -1,15 +1,22 @@
+/* فونت‌های بهینه شده با پشتیبانی بهتر برای موبایل */
 @font-face {
     font-family: 'BTitr';
-    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/b-titr-font@master/dist/BTitr-Bold.woff2') format('woff2');
+    src: url('https://cdn.fontcdn.ir/Font/Persian/Titr/Titr.woff2') format('woff2'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Titr/Titr.woff') format('woff'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Titr/Titr.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
     font-family: 'BNazanin';
-    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/b-nazanin-font@master/dist/BNazanin.woff2') format('woff2');
+    src: url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin.woff2') format('woff2'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin.woff') format('woff'),
+         url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 * {
@@ -43,7 +50,7 @@ h1 {
     font-size: 1.5rem;
     color: #333;
     font-weight: bold;
-    font-family: 'BTitr', Arial, sans-serif;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
 }
 
 .info-box {
@@ -68,7 +75,7 @@ label {
     margin-bottom: 5px;
     font-weight: bold;
     text-align: right;
-    font-family: 'BTitr', Arial, sans-serif;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1rem;
 }
 
@@ -92,7 +99,7 @@ input::placeholder {
     padding: 12px;
     border: none;
     border-radius: 5px;
-    font-family: 'BTitr', Arial, sans-serif;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -131,17 +138,30 @@ input::placeholder {
     margin-bottom: 20px;
 }
 
+/* اصلاح استایل هدر نتیجه */
 .result-header {
-    background-color: #546e7a; /* خاکستری مایل به آبی */
+    background-color: #546e7a;
     color: white;
     padding: 10px 15px;
     position: relative;
-    clip-path: polygon(0 0, 100% 0, 80% 100%, 0% 100%);
     text-align: right;
+    overflow: hidden;
+}
+
+.result-header:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #546e7a;
+    clip-path: polygon(0 0, 100% 0, 70% 100%, 0% 100%);
+    z-index: -1;
 }
 
 .result-header h3 {
-    font-family: 'BTitr', Arial, sans-serif;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1.1rem;
     font-weight: normal;
 }
@@ -153,13 +173,13 @@ input::placeholder {
     min-height: 70px;
     display: flex;
     align-items: center;
-    justify-content: center; /* مرکزبندی افقی */
+    justify-content: center;
 }
 
 .result-text {
     font-size: 1.3rem;
     color: #5c6bc0;
-    text-align: center; /* مرکزبندی متن */
+    text-align: center;
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
     width: 100%;
     direction: rtl;
@@ -188,4 +208,31 @@ input::placeholder {
 .toast.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
+}
+
+/* افزودن پشتیبانی از فونت آیکون برای دکمه تبدیل */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+    font-display: swap;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    vertical-align: middle;
+    margin-left: 5px;
 }
