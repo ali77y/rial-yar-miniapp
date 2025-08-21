@@ -28,22 +28,56 @@ conversionTypeSelect.addEventListener('change', function() {
     resultContainer.classList.add('hidden');
 });
 
+// متغیر برای ذخیره مقدار عددی خالص
+let rawNumber = '';
+
 // اضافه کردن جداکننده هزارگان هنگام تایپ
-amountInput.addEventListener('input', function() {
-    // حذف کاراکترهای غیر عددی
-    let value = this.value.replace(/[^\d]/g, '');
+amountInput.addEventListener('input', function(e) {
+    // ذخیره موقعیت کرسر
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
     
-    // اضافه کردن کاما به عنوان جداکننده هزارگان
-    if (value) {
-        this.value = Number(value).toLocaleString('fa-IR');
+    // حفظ عدد خالص قبلی اگر کاربر در حال تایپ است
+    if (e.inputType === 'insertText' && /\d/.test(e.data)) {
+        // اضافه کردن رقم جدید به موقعیت مناسب
+        const cleanValue = this.value.replace(/[^\d]/g, '');
+        rawNumber = cleanValue;
+    } 
+    // اگر کاربر در حال حذف کردن است
+    else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+        rawNumber = this.value.replace(/[^\d]/g, '');
     }
+    // برای پیست کردن یا سایر حالت‌ها
+    else {
+        rawNumber = this.value.replace(/[^\d]/g, '');
+    }
+    
+    // حفظ مقدار خالی
+    if (rawNumber === '') {
+        this.value = '';
+        return;
+    }
+    
+    // فرمت‌دهی با جداکننده هزارگان به صورت دستی برای اعداد بزرگ
+    let formattedValue = '';
+    for (let i = 0; i < rawNumber.length; i++) {
+        if (i > 0 && (rawNumber.length - i) % 3 === 0) {
+            formattedValue += ',';
+        }
+        formattedValue += rawNumber[i];
+    }
+    
+    this.value = formattedValue;
+    
+    // تنظیم مجدد موقعیت کرسر با در نظر گرفتن کاماهای اضافه شده
+    const commasBefore = formattedValue.substring(0, start).split(',').length - 1;
+    this.setSelectionRange(start + commasBefore, end + commasBefore);
 });
 
 // دکمه تبدیل
 convertBtn.addEventListener('click', function() {
-    // دریافت مقادیر ورودی
-    const conversionType = conversionTypeSelect.value;
-    const inputValue = amountInput.value.replace(/[^\d]/g, '');
+    // دریافت مقدار عددی خالص
+    const inputValue = rawNumber || amountInput.value.replace(/[^\d]/g, '');
     
     if (!inputValue) {
         alert('لطفاً یک عدد وارد کنید');
@@ -53,29 +87,41 @@ convertBtn.addEventListener('click', function() {
     let rialValue, tomanValue;
     
     // انجام تبدیل براساس نوع انتخاب شده
-    if (conversionType === 'toman-to-rial') {
-        tomanValue = parseInt(inputValue);
-        rialValue = tomanValue * 10;
+    if (conversionTypeSelect.value === 'toman-to-rial') {
+        tomanValue = BigInt(inputValue);
+        rialValue = tomanValue * BigInt(10);
         
-        // نمایش نتیجه عددی
-        numericResult.textContent = `${rialValue.toLocaleString('fa-IR')} ریال`;
+        // نمایش نتیجه عددی - تبدیل به string برای اعداد بزرگ
+        numericResult.textContent = formatLargeNumber(rialValue.toString()) + ' ریال';
         
         // تبدیل به حروف
-        textResult.textContent = `${numberToWords(rialValue)} ریال`;
+        textResult.textContent = `${numberToWords(rialValue.toString())} ریال`;
     } else {
-        rialValue = parseInt(inputValue);
-        tomanValue = Math.floor(rialValue / 10);
+        rialValue = BigInt(inputValue);
+        tomanValue = rialValue / BigInt(10);
         
         // نمایش نتیجه عددی
-        numericResult.textContent = `${tomanValue.toLocaleString('fa-IR')} تومان`;
+        numericResult.textContent = formatLargeNumber(tomanValue.toString()) + ' تومان';
         
         // تبدیل به حروف
-        textResult.textContent = `${numberToWords(tomanValue)} تومان`;
+        textResult.textContent = `${numberToWords(tomanValue.toString())} تومان`;
     }
     
     // نمایش نتایج
     resultContainer.classList.remove('hidden');
 });
+
+// تابع فرمت‌دهی اعداد بزرگ با جداکننده هزارگان
+function formatLargeNumber(numStr) {
+    let result = '';
+    for (let i = 0; i < numStr.length; i++) {
+        if (i > 0 && (numStr.length - i) % 3 === 0) {
+            result += ',';
+        }
+        result += numStr[i];
+    }
+    return result;
+}
 
 // کپی کردن نتیجه عددی
 copyNumericBtn.addEventListener('click', function() {
@@ -125,17 +171,16 @@ const hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پان�
 const scales = ['', 'هزار', 'میلیون', 'میلیارد', 'تریلیون', 'کوادریلیون'];
 
 // تبدیل عدد به حروف فارسی
-function numberToWords(number) {
-    if (number === 0) return 'صفر';
+function numberToWords(numStr) {
+    if (numStr === '0') return 'صفر';
     
-    const numStr = number.toString();
     let words = '';
     let scaleIndex = 0;
     
     // تقسیم عدد به گروه‌های سه رقمی
     for (let i = numStr.length; i > 0; i -= 3) {
         const start = Math.max(0, i - 3);
-        const chunk = parseInt(numStr.substring(start, i));
+        const chunk = parseInt(numStr.substring(start, i), 10);
         
         if (chunk !== 0) {
             const chunkWords = convertChunkToWords(chunk);
