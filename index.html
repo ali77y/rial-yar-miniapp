@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تبدیل ریال به تومان و تومان به ریال</title>
+    <!-- افزودن فونت پشتیبان آنلاین IRANSans -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/iran-sans-font@master/dist/IRANSansWeb.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -32,7 +34,7 @@
             </div>
             
             <button id="convert-btn" class="btn primary-btn">
-                <span class="btn-icon">&#x21bb;</span> تبدیل
+                <i class="material-icons">autorenew</i> تبدیل
             </button>
         </div>
         
@@ -60,5 +62,12 @@
     </div>
     
     <script src="script.js"></script>
+    
+    <!-- اسکریپت بررسی لود شدن فونت‌ها -->
+    <script>
+    document.fonts.ready.then(() => {
+        document.body.style.opacity = '1';
+    });
+    </script>
 </body>
 </html>
