@@ -1,3 +1,4 @@
+// برقراری ارتباط با تلگرام
 const webapp = window.Telegram?.WebApp;
 if (webapp) {
     webapp.expand();
