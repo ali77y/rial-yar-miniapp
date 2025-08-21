@@ -108,10 +108,11 @@ input::placeholder {
 .primary-btn {
     background-color: #4caf50; /* سبز کمرنگ */
     color: white;
-    font-size: 1.2rem; /* متن تبدیل بزرگتر شد */
+    font-size: 1.4rem; /* متن تبدیل بزرگتر شد */
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 15px; /* افزایش ارتفاع دکمه */
 }
 
 .primary-btn:hover {
@@ -129,7 +130,7 @@ input::placeholder {
     background-color: #5c6bc0; /* آبی پررنگ */
     color: white;
     font-size: 1.1rem;
-    margin-top: 8px; /* فاصله از باکس بالا */
+    margin-top: 15px; /* افزایش فاصله از باکس بالا به 15px */
     width: 90%; /* کوچکتر شدن دکمه‌های کپی */
     margin-left: auto;
     margin-right: auto;
@@ -149,7 +150,7 @@ input::placeholder {
 
 .btn-icon {
     margin-left: 8px;
-    font-size: 1.3rem; /* آیکون بزرگتر */
+    font-size: 1.5rem; /* آیکون بزرگتر */
 }
 
 .result-container {
@@ -157,38 +158,27 @@ input::placeholder {
 }
 
 .result-group {
-    margin-bottom: 25px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px; /* افزایش فاصله بین گروه‌های نتیجه */
     border-radius: 5px;
-    overflow: hidden;
+    overflow: visible; /* تغییر به visible برای نمایش درست سایه */
 }
 
-/* اصلاح استایل هدر نتیجه */
+/* استایل هدر مورب */
 .result-header {
     background-color: #546e7a;
     color: white;
-    padding: 10px 15px;
+    padding: 12px 15px;
     position: relative;
     text-align: right;
-    overflow: hidden;
-}
-
-.result-header:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #546e7a;
-    clip-path: polygon(0 0, 100% 0, 80% 100%, 0% 100%);
-    z-index: -1;
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .result-header h3 {
     font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: normal;
+    margin-right: 10px;
 }
 
 .result-box {
@@ -201,6 +191,8 @@ input::placeholder {
     justify-content: center;
     position: relative;
     z-index: 1;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 5px; /* فاصله اضافی با دکمه */
 }
 
 .result-box::before {
