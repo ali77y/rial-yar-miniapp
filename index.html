@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تبدیل ریال به تومان و تومان به ریال</title>
-    <!-- افزودن فونت پشتیبان آنلاین IRANSans -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/iran-sans-font@master/dist/IRANSansWeb.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -12,7 +11,36 @@
 <body>
     <div class="container">
         <header>
-            <h1>تبدیل ریال به تومان و تومان به ریال آنلاین</h1>
+            <div class="header-bar">
+                <h1 class="mini-title">تبدیل ریال به تومان و تومان به ریال آنلاین</h1>
+                <button id="theme-toggle" class="theme-btn" aria-label="تغییر حالت">
+                    <span class="icon-wrapper">
+                        <span class="icon-moon">
+                            <!-- ماه هلال کلاسیک با سایه -->
+                            <svg width="28" height="28" viewBox="0 0 28 28">
+                                <defs>
+                                    <radialGradient id="moonGrad" cx="50%" cy="50%" r="50%">
+                                        <stop offset="0%" stop-color="#f8f9fa"/>
+                                        <stop offset="100%" stop-color="#222"/>
+                                    </radialGradient>
+                                </defs>
+                                <path d="M20 14c0 5-4 9-9 9-1.8 0-3.5-.5-5-1.4 6.2-1.8 10.3-8.1 8.8-14.5C16.4 7.5 20 10.5 20 14z" fill="url(#moonGrad)" />
+                            </svg>
+                        </span>
+                        <span class="icon-sun">
+                            <svg width="28" height="28" viewBox="0 0 28 28">
+                                <circle cx="14" cy="14" r="7" fill="#ffe066"/>
+                                <g stroke="#ffd700" stroke-width="2">
+                                    <line x1="14" y1="2" x2="14" y2="6"/>
+                                    <line x1="14" y1="22" x2="14" y2="26"/>
+                                    <line x1="2" y1="14" x2="6" y2="14"/>
+                                    <line x1="22" y1="14" x2="26" y2="14"/>
+                                </g>
+                            </svg>
+                        </span>
+                    </span>
+                </button>
+            </div>
         </header>
         
         <div class="info-box">
@@ -62,8 +90,6 @@
     </div>
     
     <script src="script.js"></script>
-    
-    <!-- اسکریپت بررسی لود شدن فونت‌ها -->
     <script>
     document.fonts.ready.then(() => {
         document.body.style.opacity = '1';
