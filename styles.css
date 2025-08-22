@@ -55,7 +55,6 @@ body {
     color: #333;
     line-height: 1.6;
 }
-/* پس زمینه سه بعدی برای کل صفحه */
 .main-bg {
     min-height: 100vh;
     width: 100vw;
@@ -64,7 +63,6 @@ body {
     align-items: center;
     justify-content: center;
 }
-/* کادر سه‌بعدی برای کانتینر اصلی */
 .container {
     max-width: 600px;
     margin: 40px auto;
@@ -81,7 +79,6 @@ header {
     align-items: center;
     justify-content: space-between;
 }
-/* دکمه دارک مود دایره‌ای و سه‌بعدی */
 .theme-btn {
     background: linear-gradient(145deg, #e0e0e0 0%, #fafafa 100%);
     border: none;
@@ -91,6 +88,7 @@ header {
     width: 46px;
     height: 46px;
     border-radius: 50%;
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -311,7 +309,6 @@ input::placeholder {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
-/* حالت دارک مود */
 body.dark {
     background: #121212;
     color: #E0E0E0;
