@@ -1,16 +1,29 @@
-// دارک مود: صفحه هنگام ورود لایت باشد
+// حالت خودکار تشخیص دارک مود دستگاه
 const themeBtn = document.getElementById('theme-toggle');
 const root = document.body;
-root.classList.remove('dark');
-window.localStorage.setItem('theme', 'light');
 
-themeBtn.addEventListener('click', () => {
-    const isDark = root.classList.toggle('dark');
-    if (isDark) {
+// تابع تشخیص و اعمال تم اولیه بر اساس دستگاه
+function detectSystemTheme() {
+    if (window.localStorage.getItem('theme')) {
+        if (window.localStorage.getItem('theme') === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        root.classList.add('dark');
         window.localStorage.setItem('theme', 'dark');
     } else {
+        root.classList.remove('dark');
         window.localStorage.setItem('theme', 'light');
     }
+}
+detectSystemTheme();
+
+// دکمه تغییر تم
+themeBtn.addEventListener('click', () => {
+    const isDark = root.classList.toggle('dark');
+    window.localStorage.setItem('theme', isDark ? 'dark' : 'light');
 });
 
 // برقراری ارتباط با تلگرام
