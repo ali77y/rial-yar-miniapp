@@ -1,11 +1,9 @@
-=// دارک مود: شروع با لایت مود
+// دارک مود: صفحه هنگام ورود لایت باشد
 const themeBtn = document.getElementById('theme-toggle');
 const root = document.body;
-if (window.localStorage.getItem('theme') === 'dark') {
-    root.classList.add('dark');
-} else {
-    root.classList.remove('dark');
-}
+root.classList.remove('dark');
+window.localStorage.setItem('theme', 'light');
+
 themeBtn.addEventListener('click', () => {
     const isDark = root.classList.toggle('dark');
     if (isDark) {
@@ -15,14 +13,6 @@ themeBtn.addEventListener('click', () => {
     }
 });
 
-// تلگرام وب‌اپ
-const webapp = window.Telegram?.WebApp;
-if (webapp) {
-    webapp.expand();
-    webapp.ready();
-}
-
-// فرم و تبدیل
 const conversionTypeSelect = document.getElementById('conversion-type');
 const amountLabel = document.getElementById('amount-label');
 const amountInput = document.getElementById('amount');
