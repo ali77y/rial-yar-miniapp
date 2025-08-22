@@ -1,24 +1,45 @@
-// حالت خودکار تشخیص دارک مود دستگاه
+// حالت خودکار دارک/لایت بر اساس تم تلگرام کاربر
 const themeBtn = document.getElementById('theme-toggle');
 const root = document.body;
 
-// تابع تشخیص و اعمال تم اولیه بر اساس دستگاه
-function detectSystemTheme() {
-    if (window.localStorage.getItem('theme')) {
-        if (window.localStorage.getItem('theme') === 'dark') {
+// تابع تنظیم تم بر اساس Telegram WebApp theme
+function setThemeByTelegram() {
+    const webapp = window.Telegram?.WebApp;
+    if (webapp && webapp.themeParams) {
+        // تلگرام دارک مود است؟
+        if (webapp.themeParams.bg_color && webapp.themeParams.bg_color.toLowerCase() === "#181818") {
             root.classList.add('dark');
+            window.localStorage.setItem('theme', 'dark');
+        } else if (webapp.themeParams.bg_color && webapp.themeParams.bg_color.toLowerCase() === "#ffffff") {
+            root.classList.remove('dark');
+            window.localStorage.setItem('theme', 'light');
+        } else if (webapp.colorScheme === "dark") {
+            root.classList.add('dark');
+            window.localStorage.setItem('theme', 'dark');
         } else {
             root.classList.remove('dark');
+            window.localStorage.setItem('theme', 'light');
         }
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        root.classList.add('dark');
-        window.localStorage.setItem('theme', 'dark');
     } else {
-        root.classList.remove('dark');
-        window.localStorage.setItem('theme', 'light');
+        // fallback: اگر از تلگرام نبود، به حالت قبلی یا سیستم
+        if (window.localStorage.getItem('theme')) {
+            if (window.localStorage.getItem('theme') === 'dark') {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            root.classList.add('dark');
+            window.localStorage.setItem('theme', 'dark');
+        } else {
+            root.classList.remove('dark');
+            window.localStorage.setItem('theme', 'light');
+        }
     }
 }
-detectSystemTheme();
+
+// فراخوانی تابع تنظیم تم هنگام بارگذاری
+setThemeByTelegram();
 
 // دکمه تغییر تم
 themeBtn.addEventListener('click', () => {
@@ -31,6 +52,11 @@ const webapp = window.Telegram?.WebApp;
 if (webapp) {
     webapp.expand();
     webapp.ready();
+
+    // اگر کاربر در تلگرام تم را تغییر داد (در لحظه)
+    if (webapp.onEvent) {
+        webapp.onEvent('themeChanged', setThemeByTelegram);
+    }
 }
 
 // انتخاب المان‌های DOM
