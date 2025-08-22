@@ -1,3 +1,4 @@
+/* فونت‌های بهینه شده با پشتیبانی بهتر برای موبایل */
 @font-face {
     font-family: 'BTitr';
     src: url('https://cdn.fontcdn.ir/Font/Persian/Titr/BTitrBold.woff2') format('woff2'),
@@ -7,6 +8,7 @@
     font-style: normal;
     font-display: swap;
 }
+
 @font-face {
     font-family: 'BNazanin';
     src: url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin.woff2') format('woff2'),
@@ -16,6 +18,7 @@
     font-style: normal;
     font-display: swap;
 }
+
 @font-face {
     font-family: 'BNazaninBold';
     src: url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin-Bold.woff2') format('woff2'),
@@ -25,6 +28,7 @@
     font-style: normal;
     font-display: swap;
 }
+
 @font-face {
     font-family: 'Material Icons';
     font-style: normal;
@@ -32,6 +36,7 @@
     src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
     font-display: swap;
 }
+
 .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
@@ -44,12 +49,20 @@
     vertical-align: middle;
     margin-left: 8px;
 }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
     background-color: #f0f2f5;
     color: #333;
     line-height: 1.6;
 }
+
 .container {
     max-width: 600px;
     margin: 0 auto;
@@ -58,54 +71,53 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-.header-bar {
+
+header {
+    text-align: right;
+    margin-bottom: 20px;
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px;
 }
+
 .theme-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
+    background: none;
     border: none;
-    background: linear-gradient(145deg, #e3e3e3 60%, #fff 100%);
-    box-shadow: 0 4px 12px rgba(60,60,60,0.15), 0 1.5px 0 #cfcfcf inset;
     cursor: pointer;
-    position: relative;
-    outline: none;
-    margin-left: 0;
-    transition: box-shadow 0.4s, background 0.4s;
-    overflow: visible;
+    padding: 0;
+    margin-right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
 .theme-btn .icon-wrapper {
     position: relative;
     width: 28px;
     height: 28px;
     display: block;
-    margin: auto;
 }
+
 .theme-btn .icon-moon, .theme-btn .icon-sun {
     position: absolute;
     left: 0; top: 0;
     width: 28px; height: 28px;
-    transition: transform 0.7s cubic-bezier(.38,1.94,.64,-0.62), opacity 0.5s;
+    transition: transform 0.4s, opacity 0.3s;
     will-change: transform, opacity;
 }
-.theme-btn .icon-moon { 
-    opacity: 1; 
-    z-index: 2; 
-    transform: rotate(0deg) scale(1); 
+
+.theme-btn .icon-moon {
+    opacity: 1;
+    z-index: 2;
+    transform: rotate(0deg) scale(1);
 }
-.theme-btn .icon-sun { 
-    opacity: 0; 
-    z-index: 1; 
-    transform: rotate(-180deg) scale(0.7); 
+.theme-btn .icon-sun {
+    opacity: 0;
+    z-index: 1;
+    transform: rotate(-180deg) scale(0.7);
 }
 body.dark .theme-btn .icon-moon {
     opacity: 0;
@@ -115,17 +127,14 @@ body.dark .theme-btn .icon-sun {
     opacity: 1;
     transform: rotate(0deg) scale(1);
 }
-.mini-title {
-    font-size: 1.2rem;
-    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
-    font-weight: bold;
+
+h1 {
+    font-size: 1.5rem;
     color: #333;
-    letter-spacing: 0.5px;
-    margin: 0;
-    flex: 1;
-    text-align: right;
-    line-height: 1.2;
+    font-weight: bold;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
 }
+
 .info-box {
     background-color: #2e7d32;
     color: #fff;
@@ -134,12 +143,15 @@ body.dark .theme-btn .icon-sun {
     margin-bottom: 20px;
     text-align: right;
 }
+
 .form-container {
     margin-bottom: 20px;
 }
+
 .form-group {
     margin-bottom: 15px;
 }
+
 label {
     display: block;
     margin-bottom: 5px;
@@ -148,6 +160,7 @@ label {
     font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1rem;
 }
+
 select, input {
     width: 100%;
     padding: 12px;
@@ -157,9 +170,11 @@ select, input {
     font-size: 1rem;
     text-align: right;
 }
+
 input::placeholder {
     color: #aaa;
 }
+
 .btn {
     display: block;
     width: 100%;
@@ -171,6 +186,7 @@ input::placeholder {
     transition: all 0.3s;
     text-align: center;
 }
+
 .primary-btn {
     background-color: #3a8a3f;
     color: white;
@@ -180,15 +196,18 @@ input::placeholder {
     justify-content: center;
     padding: 15px;
 }
+
 .primary-btn:hover {
     background-color: #2d6e31;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
 .primary-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
 .secondary-btn {
     background-color: #5c6bc0;
     color: white;
@@ -200,26 +219,32 @@ input::placeholder {
     padding: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+
 .secondary-btn:hover {
     background-color: #3f51b5;
     transform: translateY(-1px);
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
+
 .secondary-btn:active {
     transform: translateY(0);
 }
+
 .btn-icon {
     margin-left: 8px;
     font-size: 1.5rem;
 }
+
 .result-container {
     margin-top: 30px;
 }
+
 .result-group {
     margin-bottom: 30px;
     border-radius: 5px;
     overflow: visible;
 }
+
 .result-header {
     background-color: #546e7a;
     color: white;
@@ -232,12 +257,14 @@ input::placeholder {
     clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
 .result-header h3 {
     font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1.2rem;
     font-weight: normal;
     margin-right: 10px;
 }
+
 .result-box {
     border: 1px solid #e0e0e0;
     padding: 20px 15px;
@@ -251,6 +278,7 @@ input::placeholder {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     margin-bottom: 5px;
 }
+
 .result-box::before {
     content: '';
     position: absolute;
@@ -267,6 +295,7 @@ input::placeholder {
     );
     z-index: -1;
 }
+
 .result-text {
     font-size: 1.1rem;
     color: #3f51b5;
@@ -277,9 +306,11 @@ input::placeholder {
     font-weight: 700;
     text-shadow: none;
 }
+
 .hidden {
     display: none;
 }
+
 .toast {
     position: fixed;
     bottom: 30px;
@@ -295,11 +326,13 @@ input::placeholder {
     transition: transform 0.3s, opacity 0.3s;
     z-index: 1000;
 }
+
 .toast.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
-/* --- حالت دارک مود --- */
+
+/* حالت دارک مود */
 body.dark {
     background: #121212;
     color: #E0E0E0;
@@ -308,7 +341,7 @@ body.dark .container {
     background: #1E1E1E;
     box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
-body.dark .mini-title {
+body.dark h1 {
     color: #E0E0E0;
 }
 body.dark .info-box {
