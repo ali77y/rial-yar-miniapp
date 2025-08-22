@@ -1,3 +1,4 @@
+/* فونت‌های بهینه شده با پشتیبانی بهتر برای موبایل */
 @font-face {
     font-family: 'BTitr';
     src: url('https://cdn.fontcdn.ir/Font/Persian/Titr/BTitrBold.woff2') format('woff2'),
@@ -7,6 +8,7 @@
     font-style: normal;
     font-display: swap;
 }
+
 @font-face {
     font-family: 'BNazanin';
     src: url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin.woff2') format('woff2'),
@@ -16,6 +18,7 @@
     font-style: normal;
     font-display: swap;
 }
+
 @font-face {
     font-family: 'BNazaninBold';
     src: url('https://cdn.fontcdn.ir/Font/Persian/Nazanin/Nazanin-Bold.woff2') format('woff2'),
@@ -25,12 +28,20 @@
     font-style: normal;
     font-display: swap;
 }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
     background-color: #f0f2f5;
     color: #333;
     line-height: 1.6;
 }
+
 .container {
     max-width: 600px;
     margin: 0 auto;
@@ -39,89 +50,36 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-.header-bar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-.theme-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: none;
-    background: linear-gradient(145deg, #e3e3e3 60%, #fff 100%);
-    box-shadow: 0 4px 12px rgba(60,60,60,0.15), 0 1.5px 0 #cfcfcf inset;
-    cursor: pointer;
-    position: relative;
-    outline: none;
-    margin-right: 0;
-    margin-left: 0;
-    transition: box-shadow 0.4s, background 0.4s;
-    overflow: visible;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.theme-btn .icon-wrapper {
-    position: relative;
-    width: 28px;
-    height: 28px;
-    display: block;
-    margin: auto;
-}
-.theme-btn .icon-moon, .theme-btn .icon-sun {
-    position: absolute;
-    left: 0; top: 0;
-    width: 28px; height: 28px;
-    transition: transform 0.7s cubic-bezier(.38,1.94,.64,-0.62), opacity 0.5s;
-    will-change: transform, opacity;
-}
-.theme-btn .icon-moon { 
-    opacity: 1; 
-    z-index: 2; 
-    transform: rotate(0deg) scale(1); 
-}
-.theme-btn .icon-sun { 
-    opacity: 0; 
-    z-index: 1; 
-    transform: rotate(-180deg) scale(0.7); 
-}
-body.dark .theme-btn .icon-moon {
-    opacity: 0;
-    transform: rotate(180deg) scale(0.7);
-}
-body.dark .theme-btn .icon-sun {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-}
-.mini-title {
-    font-size: 1.2rem;
-    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
-    font-weight: bold;
-    color: #333;
-    letter-spacing: 0.5px;
-    margin: 0;
-    flex: 1;
+
+header {
     text-align: right;
-    line-height: 1.2;
+    margin-bottom: 20px;
 }
+
+h1 {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: bold;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
+}
+
 .info-box {
-    background-color: #2e7d32;
+    background-color: #2e7d32; /* سبز پررنگ */
     color: #fff;
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 20px;
     text-align: right;
 }
+
 .form-container {
     margin-bottom: 20px;
 }
+
 .form-group {
     margin-bottom: 15px;
 }
+
 label {
     display: block;
     margin-bottom: 5px;
@@ -130,6 +88,7 @@ label {
     font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1rem;
 }
+
 select, input {
     width: 100%;
     padding: 12px;
@@ -139,9 +98,11 @@ select, input {
     font-size: 1rem;
     text-align: right;
 }
+
 input::placeholder {
     color: #aaa;
 }
+
 .btn {
     display: block;
     width: 100%;
@@ -153,73 +114,86 @@ input::placeholder {
     transition: all 0.3s;
     text-align: center;
 }
+
 .primary-btn {
-    background-color: #3a8a3f;
+    background-color: #3a8a3f; /* سبز ملایم‌تر و تیره‌تر */
     color: white;
-    font-size: 1.4rem;
+    font-size: 1.4rem; /* متن تبدیل بزرگتر شد */
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 15px;
+    padding: 15px; /* افزایش ارتفاع دکمه */
 }
+
 .primary-btn:hover {
     background-color: #2d6e31;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
 .primary-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
 .secondary-btn {
-    background-color: #5c6bc0;
+    background-color: #5c6bc0; /* آبی پررنگ */
     color: white;
     font-size: 1.1rem;
-    margin-top: 15px;
-    width: 90%;
+    margin-top: 15px; /* افزایش فاصله از باکس بالا به 15px */
+    width: 90%; /* کوچکتر شدن دکمه‌های کپی */
     margin-left: auto;
     margin-right: auto;
-    padding: 8px;
+    padding: 8px; /* ارتفاع کمتر */
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+
 .secondary-btn:hover {
     background-color: #3f51b5;
     transform: translateY(-1px);
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
+
 .secondary-btn:active {
     transform: translateY(0);
 }
+
 .btn-icon {
     margin-left: 8px;
-    font-size: 1.5rem;
+    font-size: 1.5rem; /* آیکون بزرگتر */
 }
+
 .result-container {
     margin-top: 30px;
 }
+
 .result-group {
-    margin-bottom: 30px;
+    margin-bottom: 30px; /* افزایش فاصله بین گروه‌های نتیجه */
     border-radius: 5px;
-    overflow: visible;
+    overflow: visible; /* تغییر به visible برای نمایش درست سایه */
 }
+
+/* استایل هدر مورب - راست‌چین و برعکس */
 .result-header {
     background-color: #546e7a;
     color: white;
     padding: 12px 15px;
     position: relative;
     text-align: right;
-    width: 60%;
-    margin-right: 0;
-    margin-left: auto;
-    clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+    width: 60%; /* حفظ عرض 60% */
+    margin-right: 0; /* چسبیدن به سمت راست */
+    margin-left: auto; /* فضای خالی در سمت چپ */
+    clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%); /* برعکس شدن مورب - از راست به چپ */
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
 .result-header h3 {
     font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
     font-size: 1.2rem;
-    font-weight: normal;
+    font-weight: normal; /* تغییر از bold به normal */
     margin-right: 10px;
 }
+
 .result-box {
     border: 1px solid #e0e0e0;
     padding: 20px 15px;
@@ -231,8 +205,9 @@ input::placeholder {
     position: relative;
     z-index: 1;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    margin-bottom: 5px;
+    margin-bottom: 5px; /* فاصله اضافی با دکمه */
 }
+
 .result-box::before {
     content: '';
     position: absolute;
@@ -249,6 +224,7 @@ input::placeholder {
     );
     z-index: -1;
 }
+
 .result-text {
     font-size: 1.1rem;
     color: #3f51b5;
@@ -256,41 +232,14 @@ input::placeholder {
     font-family: 'BNazaninBold', 'BNazanin', Tahoma, Arial, sans-serif;
     width: 100%;
     direction: rtl;
-    font-weight: 700;
+    font-weight: 700; /* تغییر به بولدتر برای تاکید بیشتر */
     text-shadow: none;
 }
-body.dark {
-    background: #23243a;
-    color: #e6e6f0;
-}
-body.dark .container {
-    background: #1c1d26;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-body.dark .mini-title {
-    color: #ffd700;
-}
-body.dark .info-box {
-    background-color: #23243a;
-    color: #e6e6f0;
-}
-body.dark .primary-btn {
-    background-color: #7a8a9d;
-    color: #fff;
-}
-body.dark .secondary-btn {
-    background-color: #6b6bc0;
-}
-body.dark .result-header {
-    background-color: #2d3a54;
-    color: #ffc400;
-}
-body.dark .result-text {
-    color: #7ac7f7;
-}
+
 .hidden {
     display: none;
 }
+
 .toast {
     position: fixed;
     bottom: 30px;
@@ -306,10 +255,13 @@ body.dark .result-text {
     transition: transform 0.3s, opacity 0.3s;
     z-index: 1000;
 }
+
 .toast.show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
+
+/* افزودن پشتیبانی از فونت آیکون برای دکمه تبدیل */
 @font-face {
     font-family: 'Material Icons';
     font-style: normal;
@@ -317,6 +269,7 @@ body.dark .result-text {
     src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
     font-display: swap;
 }
+
 .material-icons {
     font-family: 'Material Icons';
     font-weight: normal;
