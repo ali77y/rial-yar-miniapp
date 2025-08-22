@@ -13,6 +13,14 @@ themeBtn.addEventListener('click', () => {
     }
 });
 
+// برقراری ارتباط با تلگرام
+const webapp = window.Telegram?.WebApp;
+if (webapp) {
+    webapp.expand();
+    webapp.ready();
+}
+
+// انتخاب المان‌های DOM
 const conversionTypeSelect = document.getElementById('conversion-type');
 const amountLabel = document.getElementById('amount-label');
 const amountInput = document.getElementById('amount');
@@ -23,6 +31,7 @@ const textResult = document.getElementById('text-result');
 const copyNumericBtn = document.getElementById('copy-numeric');
 const copyTextBtn = document.getElementById('copy-text');
 
+// تنظیم متن لیبل براساس نوع تبدیل
 conversionTypeSelect.addEventListener('change', function() {
     if (this.value === 'toman-to-rial') {
         amountLabel.textContent = 'مبلغ را به تومان وارد کنید:';
@@ -32,8 +41,10 @@ conversionTypeSelect.addEventListener('change', function() {
     resultContainer.classList.add('hidden');
 });
 
+// متغیر برای ذخیره مقدار عددی خالص
 let rawNumber = '';
 
+// تبدیل اعداد فارسی به انگلیسی
 function convertPersianToEnglishNumbers(input) {
     const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
     const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
