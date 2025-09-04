@@ -134,7 +134,18 @@
                     <button class="tab-btn" data-target="crypto-section">ارزهای دیجیتال</button>
                 </div>
                 
-                <div id="currency-loading" class="loading-container">
+                <!-- لودینگ‌ها به صورت جداگانه برای هر تب -->
+                <div id="gold-loading" class="loading-container gold-loading">
+                    <div class="loading-spinner"></div>
+                    <p>در حال دریافت قیمت‌ها...</p>
+                </div>
+                
+                <div id="currency-loading" class="loading-container forex-loading hidden">
+                    <div class="loading-spinner"></div>
+                    <p>در حال دریافت قیمت‌ها...</p>
+                </div>
+                
+                <div id="crypto-loading" class="loading-container crypto-loading hidden">
                     <div class="loading-spinner"></div>
                     <p>در حال دریافت قیمت‌ها...</p>
                 </div>
@@ -185,13 +196,6 @@
     <script>
     document.fonts.ready.then(() => {
         document.body.style.opacity = '1';
-    });
-    
-    // جلوگیری از راست کلیک روی تصاویر
-    document.addEventListener('contextmenu', function(e) {
-        if(e.target.tagName === 'IMG') {
-            e.preventDefault();
-        }
     });
     </script>
 </body>
