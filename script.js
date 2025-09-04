@@ -60,7 +60,6 @@ if (webapp) {
 }
 
 // مدیریت ناوبری صفحات
-const pageTitle = document.getElementById('page-title');
 const sections = document.querySelectorAll('.page-section');
 const mainMenu = document.getElementById('main-menu');
 const converterPage = document.getElementById('converter-page');
@@ -73,6 +72,8 @@ const backButtons = document.querySelectorAll('.back-button');
 
 // تابع تغییر صفحه
 function navigateTo(targetSection) {
+    console.log('تغییر صفحه به:', targetSection);
+    
     // مخفی کردن همه صفحات
     sections.forEach(section => {
         section.classList.add('hidden');
@@ -81,27 +82,25 @@ function navigateTo(targetSection) {
     // نمایش صفحه هدف
     document.getElementById(targetSection).classList.remove('hidden');
     
-    // تنظیم عنوان صفحه
-    if (targetSection === 'main-menu') {
-        pageTitle.textContent = 'ریال یار';
-    } else if (targetSection === 'converter-page') {
-        pageTitle.textContent = 'تبدیل ریال و تومان';
-    } else if (targetSection === 'currency-page') {
-        pageTitle.textContent = 'قیمت طلا و ارز';
-        // اگر داده‌ها قبلاً دریافت نشده‌اند، آنها را دریافت کن
-        if (!currencyData) {
-            fetchCurrencyData();
-        }
+    // اگر هدف صفحه ارز است و داده‌ها قبلاً دریافت نشده‌اند، آنها را دریافت کن
+    if (targetSection === 'currency-page' && !currencyData) {
+        fetchCurrencyData();
     }
 }
 
 // گوش دادن به رویدادهای کلیک دکمه‌های ناوبری
-gotoConverterBtn.addEventListener('click', () => navigateTo('converter-page'));
-gotoCurrencyBtn.addEventListener('click', () => navigateTo('currency-page'));
+gotoConverterBtn.addEventListener('click', function() {
+    navigateTo('converter-page');
+});
 
+gotoCurrencyBtn.addEventListener('click', function() {
+    navigateTo('currency-page');
+});
+
+// اصلاح رویداد کلیک دکمه‌های برگشت
 backButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const targetSection = button.getAttribute('data-target');
+    button.addEventListener('click', function() {
+        const targetSection = this.getAttribute('data-target');
         navigateTo(targetSection);
     });
 });
@@ -339,6 +338,7 @@ function filterCurrencies(searchTerm) {
 // دریافت داده‌های ارز و طلا از API
 async function fetchCurrencyData() {
     try {
+        console.log('شروع دریافت داده‌های ارز و طلا');
         currencyLoading.classList.remove('hidden');
         currencyError.classList.add('hidden');
         goldItemsContainer.innerHTML = '';
@@ -351,11 +351,24 @@ async function fetchCurrencyData() {
             throw new Error(`خطای HTTP: ${response.status}`);
         }
         
-        const data = await response.json();
+        const responseText = await response.text();
+        console.log('پاسخ API دریافت شد. طول پاسخ:', responseText.length);
         
-        if (!data || !data.currency || !data.gold) {
+        let data;
+        try {
+            data = JSON.parse(responseText);
+            console.log('داده‌ها با موفقیت پارس شدند.');
+        } catch (e) {
+            console.error('خطا در پارس کردن JSON:', e);
             throw new Error('داده‌های نامعتبر از API');
         }
+        
+        if (!data || !data.currency || !data.gold) {
+            console.error('ساختار API نامعتبر است:', data);
+            throw new Error('داده‌های نامعتبر از API');
+        }
+        
+        console.log(`تعداد ارزها: ${data.currency.length}, تعداد طلا: ${data.gold.length}`);
         
         currencyData = data;
         
@@ -380,21 +393,39 @@ async function fetchCurrencyData() {
 
 // تابع نمایش داده‌های طلا و سکه
 function displayGoldData(goldData) {
+    console.log('نمایش داده‌های طلا و سکه. تعداد آیتم‌ها:', goldData.length);
+    
     if (!goldData || !Array.isArray(goldData) || goldData.length === 0) {
         goldItemsContainer.innerHTML = '<p class="no-data">اطلاعات طلا و سکه در دسترس نیست</p>';
         return;
     }
     
-    // فیلتر کردن آیتم‌های طلا و سکه (با type=gold یا symbol شروع شده با IR_GOLD یا IR_COIN)
-    const goldItems = goldData.filter(item => 
-        item.type === 'gold' || 
-        (item.symbol && (item.symbol.startsWith('IR_GOLD') || item.symbol.startsWith('IR_COIN') || item.symbol === 'XAUUSD'))
-    );
+    // فیلتر کردن آیتم‌های طلا و سکه
+    const goldItems = goldData.filter(item => {
+        const validItem = item && item.symbol && item.price !== undefined;
+        if (!validItem) console.log('آیتم نامعتبر طلا/سکه:', item);
+        return validItem && (
+            item.type === 'gold' || 
+            (item.symbol.startsWith('IR_GOLD') || 
+             item.symbol.startsWith('IR_COIN') || 
+             item.symbol === 'XAUUSD')
+        );
+    });
+    
+    console.log('تعداد آیتم‌های طلا و سکه پس از فیلتر:', goldItems.length);
     
     if (goldItems.length === 0) {
         goldItemsContainer.innerHTML = '<p class="no-data">اطلاعات طلا و سکه در دسترس نیست</p>';
         return;
     }
+    
+    // اطمینان از اینکه همه آیتم‌ها مقدار قیمت معتبر دارند
+    goldItems.forEach(item => {
+        if (typeof item.price !== 'number') {
+            console.log('تبدیل قیمت به عدد برای:', item.symbol);
+            item.price = parseInt(item.price, 10) || 0;
+        }
+    });
     
     // مرتب‌سازی آیتم‌ها
     const sortedGoldItems = goldItems.sort((a, b) => {
@@ -456,7 +487,7 @@ function displayCurrencyData(currencyData) {
         return;
     }
     
-        // فیلتر کردن ارزهای خارجی (با type=currency و symbol شروع نشده با IR_ یا شروع نشده با حرف B - برای ارزهای دیجیتال)
+    // فیلتر کردن ارزهای خارجی (با type=currency و symbol شروع نشده با IR_ یا شروع نشده با حرف B - برای ارزهای دیجیتال)
     const forexItems = currencyData.filter(item => 
         item.type === 'currency' && 
         item.symbol && 
