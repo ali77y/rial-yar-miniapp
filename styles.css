@@ -54,6 +54,8 @@ body {
     background-color: #f0f2f5;
     color: #333;
     line-height: 1.6;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 .main-bg {
     min-height: 100vh;
@@ -65,12 +67,14 @@ body {
 }
 .container {
     max-width: 600px;
+    width: 100%;
     margin: 40px auto;
     padding: 20px;
     background-color: #fff;
     border-radius: 22px;
     box-shadow: 0 10px 28px 0 rgba(60,60,60,0.18), 0 2px 8px rgba(60,60,60,0.07) inset;
     border: 1px solid #e0e0e0;
+    overflow: hidden;
 }
 header {
     text-align: right;
@@ -199,6 +203,12 @@ input::placeholder {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+.primary-btn.sm {
+    font-size: 1rem;
+    padding: 10px;
+    width: auto;
+    margin: 10px auto;
+}
 .secondary-btn {
     background-color: #5c6bc0;
     color: white;
@@ -309,6 +319,299 @@ input::placeholder {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
+
+/* منوی اصلی */
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+}
+.app-logo {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    animation: pulse 3s infinite;
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+.app-name {
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
+    font-size: 2rem;
+    margin-bottom: 5px;
+    color: #2E7D32;
+}
+.app-subtitle {
+    font-family: 'BNazanin', Tahoma, Arial, sans-serif;
+    color: #555;
+    font-size: 1rem;
+}
+.menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.menu-option {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
+    font-size: 1.2rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.menu-option:hover {
+    background-color: #f5f5f5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.menu-option:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.menu-option i {
+    font-size: 28px;
+    margin-left: 12px;
+    color: #2E7D32;
+}
+
+/* مدیریت صفحات */
+.page-section {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    min-height: 300px;
+}
+.page-section.hidden {
+    display: none;
+    opacity: 0;
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.page-header h2 {
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
+    font-size: 1.3rem;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    margin-right: -40px; /* برای جبران دکمه بازگشت */
+}
+.back-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #2E7D32;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+.back-button:hover {
+    background-color: rgba(46, 125, 50, 0.1);
+}
+.back-button i {
+    margin: 0;
+}
+
+/* صفحه قیمت ارز */
+.currency-tabs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+.tab-btn {
+    flex-grow: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
+    font-size: 1rem;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.tab-btn.active {
+    color: #2E7D32;
+    border-bottom-color: #2E7D32;
+}
+.tab-btn:hover:not(.active) {
+    background-color: rgba(0,0,0,0.03);
+    color: #333;
+}
+.currency-section {
+    display: block;
+}
+.currency-section.hidden {
+    display: none;
+}
+.search-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+.search-container input {
+    padding-right: 40px;
+}
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    margin: 0;
+}
+.currency-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.currency-item {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.currency-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+.currency-item.gold {
+    border-left: 4px solid #FFD700;
+}
+.currency-item.forex {
+    border-left: 4px solid #4CAF50;
+}
+.currency-item.crypto {
+    border-left: 4px solid #3F51B5;
+}
+.currency-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.currency-name {
+    font-family: 'BNazaninBold', 'BNazanin', Tahoma, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.currency-symbol {
+    background-color: #f5f5f5;
+    color: #555;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.currency-price {
+    font-size: 1.3rem;
+    color: #2E7D32;
+    font-weight: bold;
+    margin: 5px 0;
+    direction: ltr;
+    text-align: right;
+}
+.currency-unit {
+    font-size: 0.8rem;
+    color: #666;
+}
+.currency-changes {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 5px;
+}
+.change-up, .change-down, .change-neutral {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.change-up {
+    color: #388E3C;
+    background-color: rgba(56, 142, 60, 0.1);
+}
+.change-down {
+    color: #D32F2F;
+    background-color: rgba(211, 47, 47, 0.1);
+}
+.change-neutral {
+    color: #616161;
+    background-color: rgba(97, 97, 97, 0.1);
+}
+.change-icon {
+    font-size: 16px;
+    margin: 0 2px 0 0;
+}
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(46, 125, 50, 0.2);
+    border-top-color: #2E7D32;
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+    margin-bottom: 15px;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.error-container {
+    text-align: center;
+    padding: 30px 0;
+}
+.error-icon {
+    font-size: 48px;
+    color: #D32F2F;
+    margin: 0 0 15px 0;
+}
+.update-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+.update-icon {
+    font-size: 18px;
+    margin: 0 0 0 5px;
+}
+
+/* دارک مود */
 body.dark {
     background: #121212;
     color: #E0E0E0;
@@ -321,7 +624,7 @@ body.dark .container {
     box-shadow: 0 10px 32px rgba(0,0,0,0.32), 0 2px 8px #111 inset;
     border: 1px solid #2C2C2C;
 }
-body.dark h1 {
+body.dark h1, body.dark h2 {
     color: #E0E0E0;
 }
 body.dark .theme-btn {
@@ -336,9 +639,9 @@ body.dark .form-group label {
     color: #E0E0E0;
 }
 body.dark select, body.dark input {
-    background-color: #1E1E1E;
+    background-color: #2C2C2C;
     color: #E0E0E0;
-    border: 1px solid #2C2C2C;
+    border: 1px solid #444;
 }
 body.dark input::placeholder {
     color: #777777;
@@ -360,5 +663,74 @@ body.dark .result-box {
     border: 1px solid #2C2C2C;
 }
 body.dark .result-text {
+    color: #90CAF9;
+}
+body.dark .app-name {
+    color: #4CAF50;
+}
+body.dark .app-subtitle {
+    color: #BDBDBD;
+}
+body.dark .menu-option {
+    background-color: #2C2C2C;
+    border: 1px solid #444;
     color: #E0E0E0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+body.dark .menu-option:hover {
+    background-color: #333333;
+}
+body.dark .menu-option i {
+    color: #4CAF50;
+}
+body.dark .page-header {
+    border-bottom-color: #333;
+}
+body.dark .currency-tabs {
+    border-bottom-color: #333;
+}
+body.dark .tab-btn {
+    color: #BDBDBD;
+}
+body.dark .tab-btn.active {
+    color: #4CAF50;
+    border-bottom-color: #4CAF50;
+}
+body.dark .search-container input {
+    background-color: #2C2C2C;
+    border-color: #444;
+    color: #E0E0E0;
+}
+body.dark .search-icon {
+    color: #777;
+}
+body.dark .currency-item {
+    background-color: #2C2C2C;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+body.dark .currency-symbol {
+    background-color: #333;
+    color: #BDBDBD;
+}
+body.dark .currency-price {
+    color: #4CAF50;
+}
+body.dark .currency-unit {
+    color: #BDBDBD;
+}
+body.dark .change-up {
+    color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.15);
+}
+body.dark .change-down {
+    color: #F44336;
+    background-color: rgba(244, 67, 54, 0.15);
+}
+body.dark .change-neutral {
+    color: #BDBDBD;
+    background-color: rgba(189, 189, 189, 0.15);
+}
+body.dark .update-info {
+    color: #BDBDBD;
+    border-top-color: #333;
 }
