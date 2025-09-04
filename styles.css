@@ -48,6 +48,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
 }
 body {
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
@@ -56,6 +61,7 @@ body {
     line-height: 1.6;
     opacity: 0;
     transition: opacity 0.3s ease;
+    overflow-x: hidden;
 }
 .main-bg {
     min-height: 100vh;
@@ -332,17 +338,33 @@ input::placeholder {
     padding: 20px 0;
 }
 .app-logo {
-    width: 80px;
-    height: 80px;
+    width: 120px; /* افزایش اندازه لوگو */
+    height: 120px; /* افزایش اندازه لوگو */
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
 }
 .app-logo img {
-    width: 80px;
-    height: 80px;
+    width: 120px; /* افزایش اندازه لوگو */
+    height: 120px; /* افزایش اندازه لوگو */
     animation: pulse 3s infinite;
+    user-drag: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+/* نمایش لوگوی مناسب بر اساس تم */
+.app-logo .logo-light {
+    display: block;
+}
+.app-logo .logo-dark {
+    display: none;
+}
+body.dark .app-logo .logo-light {
+    display: none;
+}
+body.dark .app-logo .logo-dark {
+    display: block;
 }
 @keyframes pulse {
     0% { transform: scale(1); }
@@ -606,6 +628,12 @@ input::placeholder {
     font-size: 18px;
     margin: 0 0 0 5px;
 }
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
 
 /* دارک مود */
 body.dark {
@@ -723,4 +751,7 @@ body.dark .change-neutral {
 body.dark .update-info {
     color: #BDBDBD;
     border-top-color: #333;
+}
+body.dark .no-data {
+    color: #999;
 }
