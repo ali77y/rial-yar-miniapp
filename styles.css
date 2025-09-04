@@ -338,16 +338,16 @@ input::placeholder {
     padding: 20px 0;
 }
 .app-logo {
-    width: 180px; /* افزایش اندازه لوگو */
-    height: 180px; /* افزایش اندازه لوگو */
+    width: 190px; /* افزایش 10 واحد به اندازه لوگو */
+    height: 190px; /* افزایش 10 واحد به اندازه لوگو */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px; /* کاهش فاصله بین لوگو و توضیحات */
 }
 .app-logo img {
-    width: 180px; /* افزایش اندازه لوگو */
-    height: 180px; /* افزایش اندازه لوگو */
+    width: 190px; /* افزایش 10 واحد به اندازه لوگو */
+    height: 190px; /* افزایش 10 واحد به اندازه لوگو */
     animation: pulse 3s infinite;
     user-drag: none;
     -webkit-user-drag: none;
@@ -357,34 +357,20 @@ input::placeholder {
 /* توضیحات سایت */
 .app-description {
     text-align: center;
-    margin-top: 10px;
-}
-.app-description h2 {
-    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-    color: #2E7D32;
+    margin-top: 5px; /* کاهش فاصله بین لوگو و توضیحات */
 }
 .app-description p {
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
-    font-size: 1rem;
+    font-size: 1.1rem; /* افزایش اندازه فونت */
     margin-bottom: 3px;
     color: #555;
 }
 
-/* نمایش لوگوی مناسب بر اساس تم */
-.app-logo .logo-light {
+/* تنها یک لوگو برای هر دو حالت */
+.app-logo .logo-light.logo-dark {
     display: block;
 }
-.app-logo .logo-dark {
-    display: none;
-}
-body.dark .app-logo .logo-light {
-    display: none;
-}
-body.dark .app-logo .logo-dark {
-    display: block;
-}
+
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -509,6 +495,11 @@ body.dark .app-logo .logo-dark {
 }
 .currency-section {
     display: block;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    max-height: 70vh; /* حداکثر ارتفاع برای اطمینان از قابلیت اسکرول */
+    padding-bottom: 20px;
 }
 .currency-section.hidden {
     display: none;
@@ -533,6 +524,7 @@ body.dark .app-logo .logo-dark {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 15px;
     margin-bottom: 20px;
+    padding-bottom: 20px;
 }
 .currency-item {
     background-color: #fff;
@@ -587,35 +579,6 @@ body.dark .app-logo .logo-dark {
     font-size: 0.8rem;
     color: #666;
 }
-.currency-changes {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 5px;
-}
-.change-up, .change-down, .change-neutral {
-    display: flex;
-    align-items: center;
-    font-size: 0.9rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-.change-up {
-    color: #388E3C;
-    background-color: rgba(56, 142, 60, 0.1);
-}
-.change-down {
-    color: #D32F2F;
-    background-color: rgba(211, 47, 47, 0.1);
-}
-.change-neutral {
-    color: #616161;
-    background-color: rgba(97, 97, 97, 0.1);
-}
-.change-icon {
-    font-size: 16px;
-    margin: 0 2px 0 0;
-}
 .loading-container {
     display: flex;
     flex-direction: column;
@@ -663,6 +626,35 @@ body.dark .app-logo .logo-dark {
     padding: 20px;
     color: #666;
     font-style: italic;
+}
+
+/* استایل‌های جدید برای ارزهای دیجیتال */
+.crypto-prices {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.crypto-price-irt, .crypto-price-usdt {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.crypto-price-irt {
+    font-size: 1.2rem;
+    color: #2E7D32;
+}
+
+.crypto-price-usdt {
+    font-size: 0.9rem;
+    color: #1976D2;
+}
+
+.crypto-unit {
+    font-size: 0.8rem;
+    color: #666;
+    margin-right: 5px;
 }
 
 /* دارک مود */
@@ -766,17 +758,14 @@ body.dark .currency-price {
 body.dark .currency-unit {
     color: #BDBDBD;
 }
-body.dark .change-up {
+body.dark .crypto-price-irt {
     color: #4CAF50;
-    background-color: rgba(76, 175, 80, 0.15);
 }
-body.dark .change-down {
-    color: #F44336;
-    background-color: rgba(244, 67, 54, 0.15);
+body.dark .crypto-price-usdt {
+    color: #64B5F6;
 }
-body.dark .change-neutral {
+body.dark .crypto-unit {
     color: #BDBDBD;
-    background-color: rgba(189, 189, 189, 0.15);
 }
 body.dark .update-info {
     color: #BDBDBD;
@@ -797,9 +786,28 @@ body.dark .back-button:hover {
 body.dark .back-button:active {
     box-shadow: 0 1px 2px rgba(0,0,0,0.2), 0 1px 0 #222 inset;
 }
-body.dark .app-description h2 {
-    color: #4CAF50;
-}
 body.dark .app-description p {
     color: #BDBDBD;
+}
+
+/* برای موبایل */
+@media (max-width: 768px) {
+    .currency-section {
+        -webkit-overflow-scrolling: touch;
+        overflow-y: scroll;
+    }
+    
+    .currency-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+/* اجازه انتخاب متن در قسمت قیمت‌ها */
+.currency-price, .result-text, .crypto-price-irt, .crypto-price-usdt {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
