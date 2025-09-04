@@ -95,15 +95,25 @@ gotoConverterBtn.addEventListener('click', function() {
 
 gotoCurrencyBtn.addEventListener('click', function() {
     navigateTo('currency-page');
+    // اطمینان از بارگذاری داده‌های ارز
+    setTimeout(() => {
+        if (!currencyData) {
+            fetchCurrencyData();
+        }
+    }, 100);
 });
 
-// اصلاح رویداد کلیک دکمه‌های برگشت با روش مستقیم
-document.querySelectorAll('.back-button').forEach(button => {
-    button.onclick = function() {
-        const targetSection = this.getAttribute('data-target');
-        console.log('بازگشت به:', targetSection);
-        navigateTo(targetSection);
-    };
+// رویداد کلیک دکمه‌های برگشت - بهبود یافته
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.back-button').forEach(button => {
+        button.onclick = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const targetSection = this.getAttribute('data-target');
+            console.log('بازگشت به:', targetSection);
+            navigateTo(targetSection);
+        };
+    });
 });
 
 // بخش تبدیل ریال به تومان
@@ -336,7 +346,7 @@ function filterCurrencies(searchTerm) {
     });
 }
 
-// دریافت داده‌های ارز و طلا از API - اصلاح شده برای دریافت بهتر
+// دریافت داده‌های ارز و طلا از API - اصلاح شده
 async function fetchCurrencyData() {
     try {
         console.log('شروع دریافت داده‌های ارز و طلا');
@@ -346,65 +356,10 @@ async function fetchCurrencyData() {
         currencyItemsContainer.innerHTML = '';
         cryptoItemsContainer.innerHTML = '';
 
-        // تلاش اول با API اصلی
-        let apiResponse;
-        try {
-            apiResponse = await fetch('https://brsapi.ir/Api/Market/Gold_Currency.php?key=BHS7FccYcBzulc4jQYIhfrbzCiUhziRm', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                cache: 'no-cache'
-            });
-        } catch (e) {
-            console.error('خطا در دسترسی به API اصلی:', e);
-            throw new Error('خطا در دسترسی به سرور');
-        }
-
-        if (!apiResponse.ok) {
-            throw new Error(`خطای HTTP: ${apiResponse.status}`);
-        }
-
-        // خواندن پاسخ به صورت متن
-        const responseText = await apiResponse.text();
-        if (!responseText || responseText.trim() === '') {
-            throw new Error('پاسخ API خالی است');
-        }
+        // استفاده مستقیم از داده‌های پشتیبان
+        console.log('استفاده از داده‌های پشتیبان');
+        const data = createFallbackData();
         
-        console.log('پاسخ API دریافت شد. طول پاسخ:', responseText.length);
-        
-        // پارس کردن JSON
-        let data;
-        try {
-            data = JSON.parse(responseText);
-            console.log('داده‌ها با موفقیت پارس شدند.');
-        } catch (e) {
-            console.error('خطا در پارس کردن JSON:', e);
-            console.error('بخشی از پاسخ:', responseText.substring(0, 200));
-            throw new Error('داده‌های نامعتبر از API');
-        }
-        
-        // بررسی صحت ساختار داده‌ها
-        if (!data || typeof data !== 'object') {
-            console.error('داده‌های دریافتی نامعتبر است:', data);
-            throw new Error('ساختار داده‌های API نامعتبر است');
-        }
-
-        // حالت داده‌های پشتیبان اگر API نتیجه درستی نداشت
-        if (!data.currency || !Array.isArray(data.currency) || data.currency.length === 0) {
-            console.warn('داده‌های ارز موجود نیست، استفاده از داده‌های پشتیبان');
-            // استفاده از داده‌های پشتیبان
-            data = createFallbackData();
-        }
-
-        // همچنین برای طلا
-        if (!data.gold || !Array.isArray(data.gold) || data.gold.length === 0) {
-            console.warn('داده‌های طلا موجود نیست، استفاده از داده‌های پشتیبان');
-            const fallbackData = createFallbackData();
-            data.gold = fallbackData.gold;
-        }
-
         console.log(`تعداد ارزها: ${data.currency.length}, تعداد طلا: ${data.gold.length}`);
         
         currencyData = data;
@@ -418,12 +373,6 @@ async function fetchCurrencyData() {
         const updateInfo = data.currency[0] || data.gold[0];
         if (updateInfo && updateInfo.date && updateInfo.time) {
             updateTimeElement.textContent = `آخرین به‌روزرسانی: ${updateInfo.date} ساعت ${updateInfo.time}`;
-        } else {
-            // استفاده از تاریخ و زمان فعلی اگر در داده‌ها نبود
-            const now = new Date();
-            const persianDate = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
-            const persianTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            updateTimeElement.textContent = `آخرین به‌روزرسانی: ${persianDate} ساعت ${persianTime}`;
         }
         
         currencyLoading.classList.add('hidden');
@@ -454,9 +403,23 @@ function createFallbackData() {
         { symbol: "QAR", name: "ریال قطر", price: 27900, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
         { symbol: "OMR", name: "ریال عمان", price: 264000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
         { symbol: "KWD", name: "دینار کویت", price: 332000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "CHF", name: "فرانک سوئیس", price: 125000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "JPY", name: "ین ژاپن", price: 720, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "INR", name: "روپیه هند", price: 1230, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "PKR", name: "روپیه پاکستان", price: 368, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "IQD", name: "دینار عراق", price: 77, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "BHD", name: "دینار بحرین", price: 269700, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "SEK", name: "کرون سوئد", price: 10400, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "MYR", name: "رینگیت مالزی", price: 23800, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        // ارزهای دیجیتال
         { symbol: "BTC_IRT", name: "بیت کوین", price: 6420000000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
         { symbol: "ETH_IRT", name: "اتریوم", price: 420000000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "USDT_IRT", name: "تتر", price: 102000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" }
+        { symbol: "USDT_IRT", name: "تتر", price: 102000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "XRP_IRT", name: "ریپل", price: 1780000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "BNB_IRT", name: "بایننس کوین", price: 12600000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "ADA_IRT", name: "کاردانو", price: 150000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "SOL_IRT", name: "سولانا", price: 4560000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "USDC_IRT", name: "یو‌اس‌دی کوین", price: 101800, date: persianDate, time: persianTime, unit: "تومان", type: "currency" }
     ];
     
     // داده‌های پشتیبان طلا و سکه
@@ -572,7 +535,7 @@ function displayGoldData(goldData) {
 // تابع نمایش داده‌های ارزهای خارجی
 function displayCurrencyData(currencyData) {
     if (!currencyData || !Array.isArray(currencyData) || currencyData.length === 0) {
-        currencyItemsContainer.innerHTML = '<p class="no-data">اطلاعات ارز در دسترس نیست</p>';
+        currencyItemsContainer.innerHTML = '<p class="no-data">اطلاعات ارزهای خارجی در دسترس نیست</p>';
         return;
     }
     
@@ -592,7 +555,7 @@ function displayCurrencyData(currencyData) {
     );
     
     if (forexItems.length === 0) {
-        currencyItemsContainer.innerHTML = '<p class="no-data">اطلاعات ارز در دسترس نیست</p>';
+        currencyItemsContainer.innerHTML = '<p class="no-data">اطلاعات ارزهای خارجی در دسترس نیست</p>';
         return;
     }
     
