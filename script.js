@@ -70,6 +70,19 @@ const gotoConverterBtn = document.getElementById('goto-converter');
 const gotoCurrencyBtn = document.getElementById('goto-currency');
 const backButtons = document.querySelectorAll('.back-button');
 
+// متغیرهای قسمت ارز
+const goldItemsContainer = document.getElementById('gold-items');
+const currencyItemsContainer = document.getElementById('currency-items');
+const cryptoItemsContainer = document.getElementById('crypto-items');
+const currencySearch = document.getElementById('currency-search');
+const currencyLoading = document.getElementById('currency-loading');
+const currencyError = document.getElementById('currency-error');
+const retryBtn = document.getElementById('retry-btn');
+const updateTimeElement = document.getElementById('update-time');
+
+// متغیر برای ذخیره داده‌های دریافتی از API
+let currencyData = null;
+
 // تابع تغییر صفحه
 function navigateTo(targetSection) {
     console.log('تغییر صفحه به:', targetSection);
@@ -82,9 +95,12 @@ function navigateTo(targetSection) {
     // نمایش صفحه هدف
     document.getElementById(targetSection).classList.remove('hidden');
     
-    // اگر هدف صفحه ارز است و داده‌ها قبلاً دریافت نشده‌اند، آنها را دریافت کن
-    if (targetSection === 'currency-page' && !currencyData) {
-        fetchCurrencyData();
+    // اگر هدف صفحه ارز است، داده‌ها را به صورت خودکار بارگذاری کن
+    if (targetSection === 'currency-page') {
+        // اطمینان از بارگذاری داده‌ها با اندکی تأخیر
+        setTimeout(() => {
+            fetchCurrencyData();
+        }, 50);
     }
 }
 
@@ -95,26 +111,29 @@ gotoConverterBtn.addEventListener('click', function() {
 
 gotoCurrencyBtn.addEventListener('click', function() {
     navigateTo('currency-page');
-    // اطمینان از بارگذاری داده‌های ارز
-    setTimeout(() => {
-        if (!currencyData) {
-            fetchCurrencyData();
-        }
-    }, 100);
 });
 
-// رویداد کلیک دکمه‌های برگشت - بهبود یافته
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.back-button').forEach(button => {
-        button.onclick = function(event) {
+// تنظیم مجدد دکمه‌های برگشت با روش مستقیم
+function setupBackButtons() {
+    const buttons = document.querySelectorAll('.back-button');
+    buttons.forEach(button => {
+        // حذف رویدادهای قبلی
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        // اضافه کردن رویداد جدید
+        newButton.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
             const targetSection = this.getAttribute('data-target');
             console.log('بازگشت به:', targetSection);
             navigateTo(targetSection);
-        };
+        });
     });
-});
+}
+
+// راه‌اندازی دکمه‌های برگشت بعد از بارگذاری صفحه
+document.addEventListener('DOMContentLoaded', setupBackButtons);
 
 // بخش تبدیل ریال به تومان
 const conversionTypeSelect = document.getElementById('conversion-type');
@@ -294,22 +313,10 @@ function convertChunkToWords(chunk) {
     return result;
 }
 
-// بخش نمایش قیمت ارز و طلا
+// بخش نمایش قیمت ارز و طلا - تغییر تب‌ها
 const currencyTabs = document.querySelectorAll('.tab-btn');
 const currencySections = document.querySelectorAll('.currency-section');
-const goldItemsContainer = document.getElementById('gold-items');
-const currencyItemsContainer = document.getElementById('currency-items');
-const cryptoItemsContainer = document.getElementById('crypto-items');
-const currencySearch = document.getElementById('currency-search');
-const currencyLoading = document.getElementById('currency-loading');
-const currencyError = document.getElementById('currency-error');
-const retryBtn = document.getElementById('retry-btn');
-const updateTimeElement = document.getElementById('update-time');
 
-// متغیر برای ذخیره داده‌های دریافتی از API
-let currencyData = null;
-
-// تابع تغییر تب
 currencyTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         // تغییر کلاس active برای دکمه‌ها
@@ -346,12 +353,14 @@ function filterCurrencies(searchTerm) {
     });
 }
 
-// دریافت داده‌های ارز و طلا از API - اصلاح شده
+// دریافت داده‌های ارز و طلا - بهبود یافته
 async function fetchCurrencyData() {
     try {
-        console.log('شروع دریافت داده‌های ارز و طلا');
+        console.log('شروع دریافت داده‌های ارز و طلا', new Date().toISOString());
         currencyLoading.classList.remove('hidden');
         currencyError.classList.add('hidden');
+        
+        // پاک کردن محتوای قبلی
         goldItemsContainer.innerHTML = '';
         currencyItemsContainer.innerHTML = '';
         cryptoItemsContainer.innerHTML = '';
@@ -360,30 +369,41 @@ async function fetchCurrencyData() {
         console.log('استفاده از داده‌های پشتیبان');
         const data = createFallbackData();
         
-        console.log(`تعداد ارزها: ${data.currency.length}, تعداد طلا: ${data.gold.length}`);
-        
+        // ذخیره داده‌ها در متغیر سراسری
         currencyData = data;
         
-        // نمایش داده‌ها
-        displayGoldData(data.gold);
-        displayCurrencyData(data.currency);
-        displayCryptoData(data.currency);
+        // نمایش داده‌ها - با تأخیر کوتاه برای اطمینان از رندر شدن DOM
+        setTimeout(() => {
+            displayGoldData(data.gold);
+            displayCurrencyData(data.currency);
+            displayCryptoData(data.currency);
         
-        // نمایش زمان به‌روزرسانی
-        const updateInfo = data.currency[0] || data.gold[0];
-        if (updateInfo && updateInfo.date && updateInfo.time) {
-            updateTimeElement.textContent = `آخرین به‌روزرسانی: ${updateInfo.date} ساعت ${updateInfo.time}`;
-        }
+            // نمایش زمان به‌روزرسانی
+            const updateInfo = data.currency[0] || data.gold[0];
+            if (updateInfo && updateInfo.date && updateInfo.time) {
+                updateTimeElement.textContent = `آخرین به‌روزرسانی: ${updateInfo.date} ساعت ${updateInfo.time}`;
+            }
         
-        currencyLoading.classList.add('hidden');
+            currencyLoading.classList.add('hidden');
+        }, 100);
+        
     } catch (error) {
         console.error('خطا در دریافت داده‌ها:', error);
         currencyLoading.classList.add('hidden');
         currencyError.classList.remove('hidden');
+        
+        // در صورت خطا نیز از داده‌های پشتیبان استفاده می‌کنیم
+        const fallbackData = createFallbackData();
+        setTimeout(() => {
+            displayGoldData(fallbackData.gold);
+            displayCurrencyData(fallbackData.currency);
+            displayCryptoData(fallbackData.currency);
+            currencyLoading.classList.add('hidden');
+        }, 100);
     }
 }
 
-// ایجاد داده‌های پشتیبان در صورت خطا در API
+// ایجاد داده‌های پشتیبان - داده‌های ثابت برای مینی اپ
 function createFallbackData() {
     const today = new Date();
     const persianDate = `1404/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
@@ -391,48 +411,48 @@ function createFallbackData() {
     
     // داده‌های پشتیبان ارزها
     const currencyData = [
-        { symbol: "USD", name: "دلار آمریکا", price: 101640, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "EUR", name: "یورو", price: 118660, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "GBP", name: "پوند انگلیس", price: 136920, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "AED", name: "درهم امارات", price: 27852, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "TRY", name: "لیر ترکیه", price: 2480, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "CAD", name: "دلار کانادا", price: 76000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "AUD", name: "دلار استرالیا", price: 70000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "CNY", name: "یوآن چین", price: 14240, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "SAR", name: "ریال عربستان", price: 27186, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "QAR", name: "ریال قطر", price: 27900, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "OMR", name: "ریال عمان", price: 264000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "KWD", name: "دینار کویت", price: 332000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "CHF", name: "فرانک سوئیس", price: 125000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "JPY", name: "ین ژاپن", price: 720, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "INR", name: "روپیه هند", price: 1230, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "PKR", name: "روپیه پاکستان", price: 368, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "IQD", name: "دینار عراق", price: 77, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "BHD", name: "دینار بحرین", price: 269700, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "SEK", name: "کرون سوئد", price: 10400, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "MYR", name: "رینگیت مالزی", price: 23800, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
+        { symbol: "USD", name: "دلار آمریکا", price: 101640, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 140 },
+        { symbol: "EUR", name: "یورو", price: 118660, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 180 },
+        { symbol: "GBP", name: "پوند انگلیس", price: 136920, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 220 },
+        { symbol: "AED", name: "درهم امارات", price: 27852, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 45 },
+        { symbol: "TRY", name: "لیر ترکیه", price: 2480, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: -20 },
+        { symbol: "CAD", name: "دلار کانادا", price: 76000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 120 },
+        { symbol: "AUD", name: "دلار استرالیا", price: 70000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 90 },
+        { symbol: "CNY", name: "یوآن چین", price: 14240, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 30 },
+        { symbol: "SAR", name: "ریال عربستان", price: 27186, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 40 },
+        { symbol: "QAR", name: "ریال قطر", price: 27900, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 35 },
+        { symbol: "OMR", name: "ریال عمان", price: 264000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 300 },
+        { symbol: "KWD", name: "دینار کویت", price: 332000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 400 },
+        { symbol: "CHF", name: "فرانک سوئیس", price: 125000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 150 },
+        { symbol: "JPY", name: "ین ژاپن", price: 720, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: -5 },
+        { symbol: "INR", name: "روپیه هند", price: 1230, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 8 },
+        { symbol: "PKR", name: "روپیه پاکستان", price: 368, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 2 },
+        { symbol: "IQD", name: "دینار عراق", price: 77, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 1 },
+        { symbol: "BHD", name: "دینار بحرین", price: 269700, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 320 },
+        { symbol: "SEK", name: "کرون سوئد", price: 10400, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 25 },
+        { symbol: "MYR", name: "رینگیت مالزی", price: 23800, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 40 },
         // ارزهای دیجیتال
-        { symbol: "BTC_IRT", name: "بیت کوین", price: 6420000000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "ETH_IRT", name: "اتریوم", price: 420000000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "USDT_IRT", name: "تتر", price: 102000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "XRP_IRT", name: "ریپل", price: 1780000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "BNB_IRT", name: "بایننس کوین", price: 12600000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "ADA_IRT", name: "کاردانو", price: 150000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "SOL_IRT", name: "سولانا", price: 4560000, date: persianDate, time: persianTime, unit: "تومان", type: "currency" },
-        { symbol: "USDC_IRT", name: "یو‌اس‌دی کوین", price: 101800, date: persianDate, time: persianTime, unit: "تومان", type: "currency" }
+        { symbol: "BTC_IRT", name: "بیت کوین", price: 6420000000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 8000000 },
+        { symbol: "ETH_IRT", name: "اتریوم", price: 420000000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 2500000 },
+        { symbol: "USDT_IRT", name: "تتر", price: 102000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 150 },
+        { symbol: "XRP_IRT", name: "ریپل", price: 1780000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 12000 },
+        { symbol: "BNB_IRT", name: "بایننس کوین", price: 12600000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 80000 },
+        { symbol: "ADA_IRT", name: "کاردانو", price: 150000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 3000 },
+        { symbol: "SOL_IRT", name: "سولانا", price: 4560000, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 30000 },
+        { symbol: "USDC_IRT", name: "یو‌اس‌دی کوین", price: 101800, date: persianDate, time: persianTime, unit: "تومان", type: "currency", change: 120 }
     ];
     
     // داده‌های پشتیبان طلا و سکه
     const goldData = [
-        { symbol: "IR_GOLD_18K", name: "طلای 18 عیار", price: 8620500, date: persianDate, time: persianTime, unit: "تومان", type: "gold" },
-        { symbol: "IR_GOLD_24K", name: "طلای 24 عیار", price: 11494000, date: persianDate, time: persianTime, unit: "تومان", type: "gold" },
-        { symbol: "IR_GOLD_MELTED", name: "طلای آب‌شده", price: 9200000, date: persianDate, time: persianTime, unit: "تومان", type: "gold" },
-        { symbol: "XAUUSD", name: "انس طلا", price: 2610, date: persianDate, time: persianTime, unit: "دلار", type: "gold" },
-        { symbol: "IR_COIN_EMAMI", name: "سکه امامی", price: 92010000, date: persianDate, time: persianTime, unit: "تومان", type: "gold" },
-        { symbol: "IR_COIN_BAHAR", name: "سکه بهار آزادی", price: 90500000, date: persianDate, time: persianTime, unit: "تومان", type: "gold" },
-        { symbol: "IR_COIN_HALF", name: "نیم سکه", price: 51000000, date: persianDate, time: persianTime, unit: "تومان", type: "gold" },
-        { symbol: "IR_COIN_QUARTER", name: "ربع سکه", price: 31000000, date: persianDate, time: persianTime, unit: "تومان", type: "gold" },
-        { symbol: "IR_COIN_1G", name: "سکه گرمی", price: 18500000, date: persianDate, time: persianTime, unit: "تومان", type: "gold" }
+        { symbol: "IR_GOLD_18K", name: "طلای 18 عیار", price: 8620500, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 15000 },
+        { symbol: "IR_GOLD_24K", name: "طلای 24 عیار", price: 11494000, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 20000 },
+        { symbol: "IR_GOLD_MELTED", name: "طلای آب‌شده", price: 9200000, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 18000 },
+        { symbol: "XAUUSD", name: "انس طلا", price: 2610, date: persianDate, time: persianTime, unit: "دلار", type: "gold", change: 5 },
+        { symbol: "IR_COIN_EMAMI", name: "سکه امامی", price: 92010000, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 250000 },
+        { symbol: "IR_COIN_BAHAR", name: "سکه بهار آزادی", price: 90500000, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 200000 },
+        { symbol: "IR_COIN_HALF", name: "نیم سکه", price: 51000000, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 120000 },
+        { symbol: "IR_COIN_QUARTER", name: "ربع سکه", price: 31000000, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 80000 },
+        { symbol: "IR_COIN_1G", name: "سکه گرمی", price: 18500000, date: persianDate, time: persianTime, unit: "تومان", type: "gold", change: 40000 }
     ];
     
     return {
@@ -692,3 +712,13 @@ function displayCryptoData(currencyData) {
 
 // رویداد دکمه تلاش مجدد
 retryBtn.addEventListener('click', fetchCurrencyData);
+
+// بارگذاری خودکار داده‌ها در شروع
+window.addEventListener('load', function() {
+    // پیش‌بارگذاری داده‌ها حتی اگر کاربر در صفحه اصلی باشد
+    setTimeout(function() {
+        if (!currencyData) {
+            fetchCurrencyData();
+        }
+    }, 300);
+});
