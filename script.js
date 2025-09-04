@@ -11,20 +11,43 @@ const currencyError = document.getElementById('currency-error');
 const updateTimeElement = document.getElementById('update-time');
 const cryptoSearch = document.getElementById('crypto-search');
 
-// تابع تنظیم تم
+// تابع تنظیم تم بر اساس Telegram WebApp theme
 function setThemeByTelegram() {
-    if (window.Telegram?.WebApp) {
-        if (window.Telegram.WebApp.colorScheme === "dark") {
+    const webapp = window.Telegram?.WebApp;
+    if (webapp && webapp.themeParams) {
+        // تلگرام دارک مود است؟
+        if (webapp.themeParams.bg_color && webapp.themeParams.bg_color.toLowerCase() === "#181818") {
             root.classList.add('dark');
+            window.localStorage.setItem('theme', 'dark');
+        } else if (webapp.themeParams.bg_color && webapp.themeParams.bg_color.toLowerCase() === "#ffffff") {
+            root.classList.remove('dark');
+            window.localStorage.setItem('theme', 'light');
+        } else if (webapp.colorScheme === "dark") {
+            root.classList.add('dark');
+            window.localStorage.setItem('theme', 'dark');
         } else {
             root.classList.remove('dark');
+            window.localStorage.setItem('theme', 'light');
         }
-    } else if (window.localStorage.getItem('theme') === 'dark') {
-        root.classList.add('dark');
+    } else {
+        // fallback: اگر از تلگرام نبود، به حالت قبلی یا سیستم
+        if (window.localStorage.getItem('theme')) {
+            if (window.localStorage.getItem('theme') === 'dark') {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            root.classList.add('dark');
+            window.localStorage.setItem('theme', 'dark');
+        } else {
+            root.classList.remove('dark');
+            window.localStorage.setItem('theme', 'light');
+        }
     }
 }
 
-// اجرای تنظیم تم
+// فراخوانی تابع تنظیم تم هنگام بارگذاری
 setThemeByTelegram();
 
 // دکمه تغییر تم
@@ -268,12 +291,12 @@ function showCurrencyData() {
             // دریافت و نمایش داده‌های ارز دیجیتال از API
             fetchCryptoData();
             
-            // مخفی کردن لودینگ برای طلا و ارزهای خارجی
-            if (currencyLoading) {
-                setTimeout(() => {
+            // تایمر برای مخفی کردن لودینگ در صورت طولانی شدن درخواست
+            setTimeout(() => {
+                if (currencyLoading && !currencyLoading.classList.contains('hidden')) {
                     currencyLoading.classList.add('hidden');
-                }, 500);
-            }
+                }
+            }, 5000);
             
         } catch (error) {
             console.error("خطا در نمایش داده‌ها:", error);
@@ -299,10 +322,15 @@ async function fetchCryptoData() {
                 const cryptoHTML = getCryptoDataHTMLFromAPI(data);
                 cryptoItemsContainer.innerHTML = cryptoHTML;
                 console.log("داده‌های ارز دیجیتال نمایش داده شد");
+                
+                // تنظیم جستجوی ارزهای دیجیتال
+                setupCryptoSearch();
             }
             
-            // تنظیم جستجوی ارزهای دیجیتال
-            setupCryptoSearch();
+            // مخفی کردن لودینگ
+            if (currencyLoading) {
+                currencyLoading.classList.add('hidden');
+            }
             
         } else {
             throw new Error("داده‌های دریافتی از API معتبر نیستند");
@@ -319,7 +347,7 @@ async function fetchCryptoData() {
             // تنظیم جستجوی ارزهای دیجیتال
             setupCryptoSearch();
         }
-    } finally {
+        
         // مخفی کردن لودینگ
         if (currencyLoading) {
             currencyLoading.classList.add('hidden');
@@ -336,7 +364,7 @@ function setupCryptoSearch() {
             
             cryptoItems.forEach(item => {
                 const cryptoName = item.querySelector('.currency-name').textContent.toLowerCase();
-                const cryptoSymbol = item.getAttribute('data-symbol').toLowerCase();
+                const cryptoSymbol = item.getAttribute('data-symbol')?.toLowerCase() || '';
                 
                 if (cryptoName.includes(searchTerm) || cryptoSymbol.includes(searchTerm)) {
                     item.style.display = 'flex';
@@ -353,27 +381,49 @@ function getCryptoDataHTMLFromAPI(data) {
     // بررسی ارزهای موجود در API
     const cryptoList = [];
     
-    // جمع‌آوری داده‌های ارزها
+    // جمع‌آوری داده‌های ارزهای ریالی
     cryptoCurrenciesIRT.forEach(irtSymbol => {
-        // گرفتن نام کوتاه ارز (مثلاً BTC از BTCIRT)
-        const baseSymbol = irtSymbol.replace('IRT', '');
-        
-        // معادل USDT آن
-        const usdtSymbol = baseSymbol + 'USDT';
-        
-        // اگر در داده‌های API موجود باشد
         if (data[irtSymbol] && data[irtSymbol].lastTradePrice) {
+            // گرفتن نام کوتاه ارز (مثلاً BTC از BTCIRT)
+            const baseSymbol = irtSymbol.replace('IRT', '');
+            
+            // معادل USDT آن
+            const usdtSymbol = baseSymbol + 'USDT';
+            
+            // اگر در داده‌های API موجود باشد
             const irtPrice = parseInt(data[irtSymbol].lastTradePrice);
             const usdtPrice = data[usdtSymbol] ? parseFloat(data[usdtSymbol].lastTradePrice) : null;
             
             // نام فارسی ارز
-            const shortSymbol = baseSymbol.replace(/^1[BKM]_/, ''); // حذف پیشوندهای 1B_، 1K_، 1M_
+            const shortSymbol = baseSymbol.replace(/^1[BKM]_/, '').replace(/^100K_/, '').replace(/^1B_/, '');
             const name = cryptoNames[shortSymbol] || shortSymbol;
             
             cryptoList.push({
                 symbol: baseSymbol,
                 name: name,
                 irtPrice: irtPrice,
+                usdtPrice: usdtPrice
+            });
+        }
+    });
+    
+    // اضافه کردن ارزهای دلاری که فقط قیمت دلاری دارند
+    cryptoCurrenciesUSDT.forEach(usdtSymbol => {
+        const baseSymbol = usdtSymbol.replace('USDT', '');
+        const irtSymbol = baseSymbol + 'IRT';
+        
+        // اگر قبلاً اضافه نشده و در داده‌ها موجود است
+        if (!cryptoList.some(item => item.symbol === baseSymbol) && data[usdtSymbol] && data[usdtSymbol].lastTradePrice) {
+            const usdtPrice = parseFloat(data[usdtSymbol].lastTradePrice);
+            
+            // نام فارسی ارز
+            const shortSymbol = baseSymbol.replace(/^1[BKM]_/, '').replace(/^100K_/, '').replace(/^1B_/, '');
+            const name = cryptoNames[shortSymbol] || shortSymbol;
+            
+            cryptoList.push({
+                symbol: baseSymbol,
+                name: name,
+                irtPrice: null,
                 usdtPrice: usdtPrice
             });
         }
@@ -395,11 +445,10 @@ function getCryptoDataHTMLFromAPI(data) {
     
     // ساخت HTML برای هر ارز دیجیتال
     return cryptoList.map(crypto => {
-        // تبدیل قیمت ریال به تومان
-        const tomanPrice = Math.floor(crypto.irtPrice / 10);
-        
         // نمایش قیمت ریالی (تومانی)
-        const irtPriceHtml = `<div class="crypto-price-irt">${formatNumber(tomanPrice)} <span class="crypto-unit">تومان</span></div>`;
+        const irtPriceHtml = crypto.irtPrice 
+            ? `<div class="crypto-price-irt">${formatNumber(Math.floor(crypto.irtPrice / 10))} <span class="crypto-unit">تومان</span></div>` 
+            : '';
         
         // نمایش قیمت دلاری
         const usdtPriceHtml = crypto.usdtPrice 
@@ -431,7 +480,14 @@ function getFallbackCryptoHTML() {
         { symbol: "BNB", name: "بایننس‌کوین", tomanPrice: 63500000, usdPrice: 620 },
         { symbol: "ADA", name: "کاردانو", tomanPrice: 12800, usdPrice: 0.45 },
         { symbol: "SOL", name: "سولانا", tomanPrice: 31400000, usdPrice: 300 },
-        { symbol: "DOGE", name: "دوج‌کوین", tomanPrice: 3880, usdPrice: 0.12 }
+        { symbol: "DOGE", name: "دوج‌کوین", tomanPrice: 3880, usdPrice: 0.12 },
+        { symbol: "SHIB", name: "شیبا اینو", tomanPrice: 120, usdPrice: 0.00012 },
+        { symbol: "DOT", name: "پولکادات", tomanPrice: 1840000, usdPrice: 18.5 },
+        { symbol: "TRX", name: "ترون", tomanPrice: 3500, usdPrice: 0.12 },
+        { symbol: "AVAX", name: "آوالانچ", tomanPrice: 8200000, usdPrice: 75 },
+        { symbol: "MATIC", name: "پالیگان", tomanPrice: 27000, usdPrice: 0.25 },
+        { symbol: "LINK", name: "چین‌لینک", tomanPrice: 2500000, usdPrice: 24.5 },
+        { symbol: "LTC", name: "لایت‌کوین", tomanPrice: 4150000, usdPrice: 41 }
     ];
     
     return cryptoData.map(crypto => {
@@ -525,7 +581,7 @@ conversionTypeSelect?.addEventListener('change', function() {
     if (resultContainer) resultContainer.classList.add('hidden');
 });
 
-// رویداد ورودی عدد با فرمت‌دهی خودکار
+// متغیر برای ذخیره مقدار عددی خالص
 let rawNumber = '';
 
 // تبدیل اعداد فارسی به انگلیسی
@@ -543,16 +599,18 @@ amountInput?.addEventListener('input', function(e) {
     this.value = convertPersianToEnglishNumbers(this.value);
     const start = this.selectionStart;
     const end = this.selectionEnd;
-    
-    // پاکسازی ورودی از کاراکترهای غیر عددی
-    rawNumber = this.value.replace(/[^\d]/g, '');
-    
+    if (e.inputType === 'insertText' && /\d/.test(e.data)) {
+        const cleanValue = this.value.replace(/[^\d]/g, '');
+        rawNumber = cleanValue;
+    } else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+        rawNumber = this.value.replace(/[^\d]/g, '');
+    } else {
+        rawNumber = this.value.replace(/[^\d]/g, '');
+    }
     if (rawNumber === '') {
         this.value = '';
         return;
     }
-    
-    // فرمت‌دهی با جداکننده هزارگان
     let formattedValue = '';
     for (let i = 0; i < rawNumber.length; i++) {
         if (i > 0 && (rawNumber.length - i) % 3 === 0) {
@@ -560,38 +618,43 @@ amountInput?.addEventListener('input', function(e) {
         }
         formattedValue += rawNumber[i];
     }
-    
     this.value = formattedValue;
-    
-    // حفظ موقعیت کرسر
     const commasBefore = formattedValue.substring(0, start).split(',').length - 1;
     this.setSelectionRange(start + commasBefore, end + commasBefore);
 });
 
-// رویداد کلیک دکمه تبدیل
 convertBtn?.addEventListener('click', function() {
-    const inputValue = rawNumber || amountInput?.value.replace(/[^\d]/g, '') || '0';
-    
-    if (!inputValue || inputValue === '0') {
+    const inputValue = rawNumber || amountInput?.value.replace(/[^\d]/g, '');
+    if (!inputValue) {
         alert('لطفاً یک عدد وارد کنید');
         return;
     }
-    
-    let result, textVal;
+    let rialValue, tomanValue;
     if (conversionTypeSelect?.value === 'toman-to-rial') {
-        result = BigInt(inputValue) * BigInt(10);
-        if (numericResult) numericResult.textContent = formatNumber(result.toString()) + ' ریال';
-        if (textResult) textResult.textContent = `${numberToWords(result.toString())} ریال`;
+        tomanValue = BigInt(inputValue);
+        rialValue = tomanValue * BigInt(10);
+        numericResult.textContent = formatLargeNumber(rialValue.toString()) + ' ریال';
+        textResult.textContent = `${numberToWords(rialValue.toString())} ریال`;
     } else {
-        result = BigInt(inputValue) / BigInt(10);
-        if (numericResult) numericResult.textContent = formatNumber(result.toString()) + ' تومان';
-        if (textResult) textResult.textContent = `${numberToWords(result.toString())} تومان`;
+        rialValue = BigInt(inputValue);
+        tomanValue = rialValue / BigInt(10);
+        numericResult.textContent = formatLargeNumber(tomanValue.toString()) + ' تومان';
+        textResult.textContent = `${numberToWords(tomanValue.toString())} تومان`;
     }
-    
-    if (resultContainer) resultContainer.classList.remove('hidden');
+    resultContainer.classList.remove('hidden');
 });
 
-// کپی کردن نتایج
+function formatLargeNumber(numStr) {
+    let result = '';
+    for (let i = 0; i < numStr.length; i++) {
+        if (i > 0 && (numStr.length - i) % 3 === 0) {
+            result += ',';
+        }
+        result += numStr[i];
+    }
+    return result;
+}
+
 copyNumericBtn?.addEventListener('click', function() {
     copyToClipboard(numericResult.textContent);
     showToast('نتیجه عددی کپی شد');
@@ -627,10 +690,9 @@ function showToast(message) {
     }, 100);
 }
 
-// تبدیل عدد به متن
 const units = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
-const teens = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
 const tens = ['', 'ده', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
+const teens = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
 const hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
 const scales = ['', 'هزار', 'میلیون', 'میلیارد', 'تریلیون', 'کوادریلیون'];
 
@@ -702,6 +764,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // بهبود قابلیت اسکرول در موبایل
+    document.querySelectorAll('.currency-section').forEach(section => {
+        section.style.overflowY = 'auto';
+        section.style.touchAction = 'pan-y';
+        section.style.webkitOverflowScrolling = 'touch';
+    });
 });
 
 // بارگذاری مجدد در حالت سرویس کارگر
@@ -719,10 +788,34 @@ window.addEventListener('load', function() {
             currencyLoading.classList.add('hidden');
         }
     }, 500);
+    
+    // تنظیم اسکرول مناسب برای موبایل
+    enableMobileScrolling();
 });
+
+// فعال‌سازی اسکرول در موبایل
+function enableMobileScrolling() {
+    // افزودن لیسنر برای مدیریت اسکرول در موبایل
+    const sections = document.querySelectorAll('.currency-section');
+    
+    sections.forEach(section => {
+        section.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+        }, { passive: true });
+        
+        section.addEventListener('touchmove', function(e) {
+            e.stopPropagation();
+        }, { passive: true });
+    });
+}
 
 // برقراری ارتباط با تلگرام
 if (window.Telegram?.WebApp) {
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.ready();
+    
+    // اگر کاربر در تلگرام تم را تغییر داد (در لحظه)
+    if (window.Telegram.WebApp.onEvent) {
+        window.Telegram.WebApp.onEvent('themeChanged', setThemeByTelegram);
+    }
 }
