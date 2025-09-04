@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>ریال یار - تبدیل ریال، تومان و قیمت ارز</title>
     <!-- افزودن فونت پشتیبان آنلاین IRANSans -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/iran-sans-font@master/dist/IRANSansWeb.css" rel="stylesheet">
@@ -186,19 +186,6 @@
     document.fonts.ready.then(() => {
         document.body.style.opacity = '1';
     });
-    
-    // جلوگیری از زوم صفحه
-    document.addEventListener('wheel', function(e) {
-        if(e.ctrlKey) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-    
-    document.addEventListener('touchmove', function(e) {
-        if(e.scale !== 1) {
-            e.preventDefault();
-        }
-    }, { passive: false });
     
     // جلوگیری از راست کلیک روی تصاویر
     document.addEventListener('contextmenu', function(e) {
