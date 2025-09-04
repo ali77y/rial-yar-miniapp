@@ -42,13 +42,11 @@
             <div id="main-menu" class="page-section">
                 <div class="logo-container">
                     <div class="app-logo">
-                        <!-- دو نسخه لوگو برای تم‌های مختلف -->
-                        <img src="https://i.imgur.com/QrpNUFV.png" alt="ریال یار" class="logo-light" draggable="false">
-                        <img src="https://i.imgur.com/WlJazKV.png" alt="ریال یار" class="logo-dark" draggable="false">
+                        <!-- لوگوی جدید با لینک یکسان برای هر دو حالت -->
+                        <img src="https://i.imgur.com/l72piSO.png" alt="ریال یار" class="logo-light logo-dark" draggable="false">
                     </div>
-                    <!-- توضیحات سایت و کارایی‌ها -->
+                    <!-- توضیحات نزدیک‌تر به لوگو -->
                     <div class="app-description">
-                        <h2>ریال یار</h2>
                         <p>ابزار تبدیل ریال به تومان و بالعکس</p>
                         <p>نمایش آخرین قیمت‌های ارز، طلا و ارزهای دیجیتال</p>
                     </div>
@@ -167,6 +165,10 @@
                 
                 <!-- بخش ارزهای دیجیتال -->
                 <div id="crypto-section" class="currency-section hidden">
+                    <div class="search-container">
+                        <input type="text" id="crypto-search" placeholder="جستجوی ارز دیجیتال..." dir="rtl">
+                        <i class="material-icons search-icon">search</i>
+                    </div>
                     <div class="currency-items" id="crypto-items">
                         <!-- این بخش با JavaScript پر می‌شود -->
                     </div>
@@ -203,16 +205,6 @@
         if(e.target.tagName === 'IMG') {
             e.preventDefault();
         }
-    });
-    
-    // اجرای fetchCurrencyData به محض لود صفحه
-    window.addEventListener('load', function() {
-        // به صورت پیشفرض داده‌های ارزها را بارگذاری می‌کنیم
-        window.setTimeout(function() {
-            if (typeof fetchCurrencyData === 'function') {
-                fetchCurrencyData();
-            }
-        }, 100);
     });
     </script>
 </body>
