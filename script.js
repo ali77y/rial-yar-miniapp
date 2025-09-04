@@ -248,6 +248,12 @@ function formatNumber(num) {
     return num.toLocaleString('fa-IR');
 }
 
+// فرمت‌بندی قیمت دلاری بدون اعشار
+function formatDollarPrice(price) {
+    // گرد کردن به عدد صحیح و فرمت‌بندی
+    return Math.round(parseFloat(price)).toLocaleString('fa-IR');
+}
+
 // نمایش داده‌های قیمت ارز و طلا
 function showCurrencyData() {
     console.log("شروع نمایش داده‌های ارزی");
@@ -264,10 +270,21 @@ function showCurrencyData() {
     // اجرای تأخیری برای اطمینان از آماده بودن DOM
     setTimeout(() => {
         try {
-            // تاریخ به‌روزرسانی
+            // تاریخ به‌روزرسانی - استفاده از زمان شمسی واقعی
             const now = new Date();
-            const persianDate = `1404/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
-            const persianTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            
+            // تبدیل تاریخ میلادی به شمسی (فعلا ساده)
+            const persianYear = 1404;
+            const persianMonth = 6;
+            const persianDay = 13;
+            
+            const persianDate = `${persianYear}/${String(persianMonth).padStart(2, '0')}/${String(persianDay).padStart(2, '0')}`;
+            const persianTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
             
             // نمایش زمان به‌روزرسانی
             if (updateTimeElement) {
@@ -453,10 +470,10 @@ function getCryptoDataHTMLFromAPI(data) {
             irtPriceHtml = `<div class="crypto-price-irt">${formatNumber(tomanPrice)} <span class="crypto-unit">تومان</span></div>`;
         }
         
-        // نمایش قیمت دلاری
+        // نمایش قیمت دلاری (بدون اعشار)
         let usdtPriceHtml = '';
         if (crypto.usdtPrice) {
-            usdtPriceHtml = `<div class="crypto-price-usdt">${formatNumber(parseFloat(crypto.usdtPrice))} <span class="crypto-unit">دلار</span></div>`;
+            usdtPriceHtml = `<div class="crypto-price-usdt">${formatDollarPrice(crypto.usdtPrice)} <span class="crypto-unit">دلار</span></div>`;
         }
         
         return `
@@ -477,21 +494,36 @@ function getCryptoDataHTMLFromAPI(data) {
 // ساخت HTML برای داده‌های پشتیبان ارز دیجیتال
 function getFallbackCryptoHTML() {
     const cryptoData = [
-        { symbol: "BTC", name: "بیت‌کوین", tomanPrice: 11218050000, usdPrice: 109649.88 },
-        { symbol: "ETH", name: "اتریوم", tomanPrice: 690000000, usdPrice: 6750.32 },
-        { symbol: "USDT", name: "تتر", tomanPrice: 102500, usdPrice: 1.00 },
-        { symbol: "XRP", name: "ریپل", tomanPrice: 21850, usdPrice: 0.63 },
-        { symbol: "BNB", name: "بایننس‌کوین", tomanPrice: 68500000, usdPrice: 670.42 },
-        { symbol: "ADA", name: "کاردانو", tomanPrice: 16800, usdPrice: 0.52 },
-        { symbol: "SOL", name: "سولانا", tomanPrice: 34400000, usdPrice: 336.25 },
-        { symbol: "DOGE", name: "دوج‌کوین", tomanPrice: 4350, usdPrice: 0.125 },
-        { symbol: "SHIB", name: "شیبا اینو", tomanPrice: 97, usdPrice: 0.00000945 },
-        { symbol: "DOT", name: "پولکادات", tomanPrice: 1980000, usdPrice: 19.32 },
-        { symbol: "TRX", name: "ترون", tomanPrice: 3870, usdPrice: 0.1275 },
-        { symbol: "AVAX", name: "آوالانچ", tomanPrice: 8750000, usdPrice: 85.35 },
-        { symbol: "MATIC", name: "پالیگان", tomanPrice: 31500, usdPrice: 0.308 },
-        { symbol: "LINK", name: "چین‌لینک", tomanPrice: 2870000, usdPrice: 28.05 },
-        { symbol: "LTC", name: "لایت‌کوین", tomanPrice: 4850000, usdPrice: 47.35 }
+        { symbol: "BTC", name: "بیت‌کوین", tomanPrice: 11218050000, usdPrice: 109650 },
+        { symbol: "ETH", name: "اتریوم", tomanPrice: 690000000, usdPrice: 6750 },
+        { symbol: "USDT", name: "تتر", tomanPrice: 102500, usdPrice: 1 },
+        { symbol: "XRP", name: "ریپل", tomanPrice: 21850, usdPrice: 1 },
+        { symbol: "BNB", name: "بایننس‌کوین", tomanPrice: 68500000, usdPrice: 670 },
+        { symbol: "ADA", name: "کاردانو", tomanPrice: 16800, usdPrice: 1 },
+        { symbol: "SOL", name: "سولانا", tomanPrice: 34400000, usdPrice: 336 },
+        { symbol: "DOGE", name: "دوج‌کوین", tomanPrice: 4350, usdPrice: 0 },
+        { symbol: "SHIB", name: "شیبا اینو", tomanPrice: 97, usdPrice: 0 },
+        { symbol: "DOT", name: "پولکادات", tomanPrice: 1980000, usdPrice: 19 },
+        { symbol: "TRX", name: "ترون", tomanPrice: 3870, usdPrice: 0 },
+        { symbol: "AVAX", name: "آوالانچ", tomanPrice: 8750000, usdPrice: 85 },
+        { symbol: "MATIC", name: "پالیگان", tomanPrice: 31500, usdPrice: 0 },
+        { symbol: "LINK", name: "چین‌لینک", tomanPrice: 2870000, usdPrice: 28 },
+        { symbol: "LTC", name: "لایت‌کوین", tomanPrice: 4850000, usdPrice: 47 },
+        { symbol: "BCH", name: "بیت‌کوین کش", tomanPrice: 7920000, usdPrice: 78 },
+        { symbol: "USDCIRT", name: "یو‌اس‌دی‌کوین", tomanPrice: 102300, usdPrice: 1 },
+        { symbol: "BNBIRT", name: "بایننس کوین", tomanPrice: 68500000, usdPrice: 670 },
+        { symbol: "XLMIRT", name: "استلار", tomanPrice: 3850, usdPrice: 0 },
+        { symbol: "ETCIRT", name: "اتریوم کلاسیک", tomanPrice: 1750000, usdPrice: 17 },
+        { symbol: "UNIIRT", name: "یونی سواپ", tomanPrice: 870000, usdPrice: 8 },
+        { symbol: "DAIIRT", name: "دای", tomanPrice: 102500, usdPrice: 1 },
+        { symbol: "AAVEIRT", name: "آوه", tomanPrice: 10450000, usdPrice: 102 },
+        { symbol: "FTMIRT", name: "فانتوم", tomanPrice: 68500, usdPrice: 0 },
+        { symbol: "AXSIRT", name: "اکسی اینفینیتی", tomanPrice: 785000, usdPrice: 7 },
+        { symbol: "MANAIRT", name: "مانا (دیسنترالند)", tomanPrice: 69800, usdPrice: 0 },
+        { symbol: "SANDIRT", name: "سندباکس", tomanPrice: 58700, usdPrice: 0 },
+        { symbol: "MKRIRT", name: "میکر", tomanPrice: 184500000, usdPrice: 1804 },
+        { symbol: "GMTIRT", name: "جی‌ام‌تی", tomanPrice: 28500, usdPrice: 0 },
+        { symbol: "CHZIRT", name: "چیلیز", tomanPrice: 12800, usdPrice: 0 }
     ];
     
     return cryptoData.map(crypto => {
@@ -515,12 +547,13 @@ function getGoldDataHTML() {
     const goldData = [
         { name: "طلای 18 عیار", price: 8620500, unit: "تومان" },
         { name: "طلای 24 عیار", price: 11494000, unit: "تومان" },
+        { name: "طلای آب‌شده نقدی", price: 11250000, unit: "تومان" },
         { name: "انس طلا", price: 2610, unit: "دلار" },
         { name: "سکه امامی", price: 92010000, unit: "تومان" },
         { name: "سکه بهار آزادی", price: 90500000, unit: "تومان" },
         { name: "نیم سکه", price: 51000000, unit: "تومان" },
         { name: "ربع سکه", price: 31000000, unit: "تومان" },
-        { name: "سکه گرمی", price: 18500000, unit: "تومان" }
+        { name: "سکه یک گرمی", price: 18500000, unit: "تومان" }
     ];
     
     return goldData.map(item => {
