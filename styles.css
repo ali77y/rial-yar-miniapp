@@ -334,7 +334,7 @@ input::placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     padding: 20px 0;
 }
 .app-logo {
@@ -343,7 +343,7 @@ input::placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 .app-logo img {
     width: 180px; /* افزایش اندازه لوگو */
@@ -353,6 +353,25 @@ input::placeholder {
     -webkit-user-drag: none;
     pointer-events: none;
 }
+
+/* توضیحات سایت */
+.app-description {
+    text-align: center;
+    margin-top: 10px;
+}
+.app-description h2 {
+    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    color: #2E7D32;
+}
+.app-description p {
+    font-family: 'BNazanin', Tahoma, Arial, sans-serif;
+    font-size: 1rem;
+    margin-bottom: 3px;
+    color: #555;
+}
+
 /* نمایش لوگوی مناسب بر اساس تم */
 .app-logo .logo-light {
     display: block;
@@ -435,8 +454,8 @@ body.dark .app-logo .logo-dark {
     border: none;
     cursor: pointer;
     color: #2E7D32;
-    width: 50px; /* افزایش اندازه */
-    height: 50px; /* افزایش اندازه */
+    width: 46px; /* کوچک‌تر کردن دکمه برگشت */
+    height: 46px; /* کوچک‌تر کردن دکمه برگشت */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -458,7 +477,7 @@ body.dark .app-logo .logo-dark {
 }
 .back-button i {
     margin: 0;
-    font-size: 28px; /* افزایش اندازه آیکون */
+    font-size: 24px; /* کوچک‌تر کردن آیکون */
 }
 
 /* صفحه قیمت ارز */
@@ -777,4 +796,10 @@ body.dark .back-button:hover {
 }
 body.dark .back-button:active {
     box-shadow: 0 1px 2px rgba(0,0,0,0.2), 0 1px 0 #222 inset;
+}
+body.dark .app-description h2 {
+    color: #4CAF50;
+}
+body.dark .app-description p {
+    color: #BDBDBD;
 }
