@@ -46,7 +46,12 @@
                         <img src="https://i.imgur.com/QrpNUFV.png" alt="ریال یار" class="logo-light" draggable="false">
                         <img src="https://i.imgur.com/WlJazKV.png" alt="ریال یار" class="logo-dark" draggable="false">
                     </div>
-                    <!-- حذف عنوان و زیرعنوان -->
+                    <!-- توضیحات سایت و کارایی‌ها -->
+                    <div class="app-description">
+                        <h2>ریال یار</h2>
+                        <p>ابزار تبدیل ریال به تومان و بالعکس</p>
+                        <p>نمایش آخرین قیمت‌های ارز، طلا و ارزهای دیجیتال</p>
+                    </div>
                 </div>
                 
                 <div class="menu-options">
@@ -65,7 +70,7 @@
             <div id="converter-page" class="page-section hidden">
                 <div class="page-header">
                     <button class="back-button" data-target="main-menu">
-                        <i class="material-icons">arrow_back</i>
+                        <i class="material-icons">arrow_forward</i>
                     </button>
                     <h2>تبدیل ریال و تومان</h2>
                 </div>
@@ -120,7 +125,7 @@
             <div id="currency-page" class="page-section hidden">
                 <div class="page-header">
                     <button class="back-button" data-target="main-menu">
-                        <i class="material-icons">arrow_back</i>
+                        <i class="material-icons">arrow_forward</i>
                     </button>
                     <h2>قیمت طلا و ارز</h2>
                 </div>
@@ -187,11 +192,27 @@
         }
     }, { passive: false });
     
+    document.addEventListener('touchmove', function(e) {
+        if(e.scale !== 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
     // جلوگیری از راست کلیک روی تصاویر
     document.addEventListener('contextmenu', function(e) {
         if(e.target.tagName === 'IMG') {
             e.preventDefault();
         }
+    });
+    
+    // اجرای fetchCurrencyData به محض لود صفحه
+    window.addEventListener('load', function() {
+        // به صورت پیشفرض داده‌های ارزها را بارگذاری می‌کنیم
+        window.setTimeout(function() {
+            if (typeof fetchCurrencyData === 'function') {
+                fetchCurrencyData();
+            }
+        }, 100);
     });
     </script>
 </body>
