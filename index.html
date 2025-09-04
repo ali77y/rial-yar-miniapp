@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ریال یار - تبدیل ریال، تومان و قیمت ارز</title>
     <!-- افزودن فونت پشتیبان آنلاین IRANSans -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/iran-sans-font@master/dist/IRANSansWeb.css" rel="stylesheet">
@@ -42,8 +42,9 @@
             <div id="main-menu" class="page-section">
                 <div class="logo-container">
                     <div class="app-logo">
-                        <!-- فقط تصویر لوگو با انیمیشن -->
-                        <img src="https://i.imgur.com/WlJazKV.png" alt="ریال یار" width="80" height="80">
+                        <!-- دو نسخه لوگو برای تم‌های مختلف -->
+                        <img src="https://i.imgur.com/QrpNUFV.png" alt="ریال یار" class="logo-light" draggable="false">
+                        <img src="https://i.imgur.com/WlJazKV.png" alt="ریال یار" class="logo-dark" draggable="false">
                     </div>
                     <!-- حذف عنوان و زیرعنوان -->
                 </div>
@@ -127,7 +128,7 @@
                 <div class="currency-tabs">
                     <button class="tab-btn active" data-target="gold-section">طلا و سکه</button>
                     <button class="tab-btn" data-target="currency-section">ارزهای خارجی</button>
-                    <button class="tab-btn" data-target="crypto-section">ارز دیجیتال</button>
+                    <button class="tab-btn" data-target="crypto-section">ارزهای دیجیتال</button>
                 </div>
                 
                 <div id="currency-loading" class="loading-container">
@@ -177,6 +178,20 @@
     <script>
     document.fonts.ready.then(() => {
         document.body.style.opacity = '1';
+    });
+    
+    // جلوگیری از زوم صفحه
+    document.addEventListener('wheel', function(e) {
+        if(e.ctrlKey) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // جلوگیری از راست کلیک روی تصاویر
+    document.addEventListener('contextmenu', function(e) {
+        if(e.target.tagName === 'IMG') {
+            e.preventDefault();
+        }
     });
     </script>
 </body>
