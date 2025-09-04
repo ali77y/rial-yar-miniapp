@@ -334,8 +334,8 @@ input::placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 30px;
-    padding: 20px 0;
+    margin-bottom: 25px; /* کاهش فاصله بین لوگو و دکمه‌ها */
+    padding: 15px 0; /* کاهش فاصله کلی */
 }
 .app-logo {
     width: 190px; /* افزایش 10 واحد به اندازه لوگو */
@@ -343,7 +343,7 @@ input::placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 5px; /* کاهش فاصله بین لوگو و توضیحات */
+    margin-bottom: 0; /* حذف فاصله بین لوگو و توضیحات */
 }
 .app-logo img {
     width: 190px; /* افزایش 10 واحد به اندازه لوگو */
@@ -357,12 +357,12 @@ input::placeholder {
 /* توضیحات سایت */
 .app-description {
     text-align: center;
-    margin-top: 5px; /* کاهش فاصله بین لوگو و توضیحات */
+    margin-top: 0; /* حذف فاصله بین لوگو و توضیحات */
 }
 .app-description p {
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
     font-size: 1.1rem; /* افزایش اندازه فونت */
-    margin-bottom: 3px;
+    margin-bottom: 2px; /* کاهش فاصله بین خطوط توضیحات */
     color: #555;
 }
 
