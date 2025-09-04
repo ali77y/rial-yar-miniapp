@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تبدیل ریال به تومان و تومان به ریال</title>
+    <title>ریال یار - تبدیل ریال، تومان و قیمت ارز</title>
     <!-- افزودن فونت پشتیبان آنلاین IRANSans -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/iran-sans-font@master/dist/IRANSansWeb.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -13,7 +13,7 @@
     <div class="main-bg">
         <div class="container">
             <header>
-                <h1>تبدیل ریال به تومان و تومان به ریال آنلاین</h1>
+                <h1 id="page-title">ریال یار</h1>
                 <button id="theme-toggle" class="theme-btn" aria-label="تغییر حالت">
                     <span class="icon-wrapper">
                         <span class="icon-moon">
@@ -37,48 +37,139 @@
                 </button>
             </header>
             
-            <div class="info-box">
-                <p>برای تبدیل تومان به ریال یا تبدیل ریال به تومان بعد از انتخاب نوع تبدیل عدد مربوطه وارد کنید.</p>
+            <!-- منوی اصلی -->
+            <div id="main-menu" class="page-section">
+                <div class="logo-container">
+                    <div class="app-logo">
+                        <svg width="80" height="80" viewBox="0 0 24 24">
+                            <path fill="#4CAF50" d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M11,7H13V13H11V7M11,15H13V17H11V15Z" />
+                        </svg>
+                    </div>
+                    <h2 class="app-name">ریال یار</h2>
+                    <p class="app-subtitle">ابزار تبدیل و قیمت ارز</p>
+                </div>
+                
+                <div class="menu-options">
+                    <button id="goto-converter" class="menu-option">
+                        <i class="material-icons">autorenew</i>
+                        <span>تبدیل ریال و تومان</span>
+                    </button>
+                    <button id="goto-currency" class="menu-option">
+                        <i class="material-icons">monetization_on</i>
+                        <span>قیمت طلا و ارز</span>
+                    </button>
+                </div>
             </div>
             
-            <div class="form-container">
-                <div class="form-group">
-                    <label for="conversion-type">نوع تبدیل:</label>
-                    <select id="conversion-type">
-                        <option value="toman-to-rial">تومان به ریال</option>
-                        <option value="rial-to-toman">ریال به تومان</option>
-                    </select>
+            <!-- بخش تبدیل ریال به تومان -->
+            <div id="converter-page" class="page-section hidden">
+                <div class="page-header">
+                    <button class="back-button" data-target="main-menu">
+                        <i class="material-icons">arrow_back</i>
+                    </button>
+                    <h2>تبدیل ریال و تومان</h2>
                 </div>
                 
-                <div class="form-group">
-                    <label id="amount-label">مبلغ را به تومان وارد کنید:</label>
-                    <input type="text" id="amount" placeholder="به طور مثال: 50000" dir="ltr">
+                <div class="info-box">
+                    <p>برای تبدیل تومان به ریال یا تبدیل ریال به تومان بعد از انتخاب نوع تبدیل عدد مربوطه وارد کنید.</p>
                 </div>
                 
-                <button id="convert-btn" class="btn primary-btn">
-                    <i class="material-icons btn-icon">autorenew</i> تبدیل
-                </button>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="conversion-type">نوع تبدیل:</label>
+                        <select id="conversion-type">
+                            <option value="toman-to-rial">تومان به ریال</option>
+                            <option value="rial-to-toman">ریال به تومان</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label id="amount-label">مبلغ را به تومان وارد کنید:</label>
+                        <input type="text" id="amount" placeholder="به طور مثال: 50000" dir="ltr">
+                    </div>
+                    
+                    <button id="convert-btn" class="btn primary-btn">
+                        <i class="material-icons btn-icon">autorenew</i> تبدیل
+                    </button>
+                </div>
+                
+                <div id="result-container" class="result-container hidden">
+                    <div class="result-group">
+                        <div class="result-header">
+                            <h3>نتیجه به عدد</h3>
+                        </div>
+                        <div class="result-box">
+                            <span id="numeric-result" class="result-text"></span>
+                        </div>
+                        <button id="copy-numeric" class="btn secondary-btn">کپی</button>
+                    </div>
+                    
+                    <div class="result-group">
+                        <div class="result-header">
+                            <h3>نتیجه به حروف</h3>
+                        </div>
+                        <div class="result-box">
+                            <span id="text-result" class="result-text"></span>
+                        </div>
+                        <button id="copy-text" class="btn secondary-btn">کپی</button>
+                    </div>
+                </div>
             </div>
             
-            <div id="result-container" class="result-container hidden">
-                <div class="result-group">
-                    <div class="result-header">
-                        <h3>نتیجه به عدد</h3>
-                    </div>
-                    <div class="result-box">
-                        <span id="numeric-result" class="result-text"></span>
-                    </div>
-                    <button id="copy-numeric" class="btn secondary-btn">کپی</button>
+            <!-- بخش قیمت طلا و ارز -->
+            <div id="currency-page" class="page-section hidden">
+                <div class="page-header">
+                    <button class="back-button" data-target="main-menu">
+                        <i class="material-icons">arrow_back</i>
+                    </button>
+                    <h2>قیمت طلا و ارز</h2>
                 </div>
                 
-                <div class="result-group">
-                    <div class="result-header">
-                        <h3>نتیجه به حروف</h3>
+                <div class="currency-tabs">
+                    <button class="tab-btn active" data-target="gold-section">طلا و سکه</button>
+                    <button class="tab-btn" data-target="currency-section">ارزهای خارجی</button>
+                    <button class="tab-btn" data-target="crypto-section">ارز دیجیتال</button>
+                </div>
+                
+                <div id="currency-loading" class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>در حال دریافت قیمت‌ها...</p>
+                </div>
+                
+                <div id="currency-error" class="error-container hidden">
+                    <i class="material-icons error-icon">error_outline</i>
+                    <p>خطا در دریافت اطلاعات</p>
+                    <button id="retry-btn" class="btn primary-btn sm">تلاش مجدد</button>
+                </div>
+                
+                <!-- بخش طلا و سکه -->
+                <div id="gold-section" class="currency-section">
+                    <div class="currency-items" id="gold-items">
+                        <!-- این بخش با JavaScript پر می‌شود -->
                     </div>
-                    <div class="result-box">
-                        <span id="text-result" class="result-text"></span>
+                </div>
+                
+                <!-- بخش ارزهای خارجی -->
+                <div id="currency-section" class="currency-section hidden">
+                    <div class="search-container">
+                        <input type="text" id="currency-search" placeholder="جستجوی ارز..." dir="rtl">
+                        <i class="material-icons search-icon">search</i>
                     </div>
-                    <button id="copy-text" class="btn secondary-btn">کپی</button>
+                    <div class="currency-items" id="currency-items">
+                        <!-- این بخش با JavaScript پر می‌شود -->
+                    </div>
+                </div>
+                
+                <!-- بخش ارزهای دیجیتال -->
+                <div id="crypto-section" class="currency-section hidden">
+                    <div class="currency-items" id="crypto-items">
+                        <!-- این بخش با JavaScript پر می‌شود -->
+                    </div>
+                </div>
+                
+                <div class="update-info">
+                    <i class="material-icons update-icon">update</i>
+                    <span id="update-time">آخرین به‌روزرسانی: --/--/---- ساعت --:--</span>
                 </div>
             </div>
         </div>
