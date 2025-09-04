@@ -9,6 +9,7 @@ const cryptoItemsContainer = document.getElementById('crypto-items');
 const currencyLoading = document.getElementById('currency-loading');
 const currencyError = document.getElementById('currency-error');
 const updateTimeElement = document.getElementById('update-time');
+const cryptoSearch = document.getElementById('crypto-search');
 
 // تابع تنظیم تم
 function setThemeByTelegram() {
@@ -31,6 +32,148 @@ themeBtn.addEventListener('click', () => {
     const isDark = root.classList.toggle('dark');
     window.localStorage.setItem('theme', isDark ? 'dark' : 'light');
 });
+
+// لیست ارزهای دیجیتال موردنظر برای نمایش (ریالی)
+const cryptoCurrenciesIRT = [
+    "BTCIRT", "ETHIRT", "LTCIRT", "USDTIRT", "XRPIRT", "BCHIRT", "BNBIRT", "EOSIRT", 
+    "XLMIRT", "ETCIRT", "TRXIRT", "DOGEIRT", "UNIIRT", "DAIIRT", "LINKIRT", "DOTIRT", 
+    "AAVEIRT", "ADAIRT", "SHIBIRT", "FTMIRT", "MATICIRT", "AXSIRT", "MANAIRT", "SANDIRT", 
+    "AVAXIRT", "MKRIRT", "GMTIRT", "USDCIRT", "CHZIRT", "GRTIRT", "CRVIRT", "EGLDIRT", 
+    "GALIRT", "HBARIRT", "IMXIRT", "WBTCIRT", "ONEIRT", "ENSIRT", "1M_BTTIRT", "SUSHIIRT", 
+    "LDOIRT", "ZROIRT", "STORJIRT", "ANTIRT", "100K_FLOKIIRT", "GLMIRT", "OMIRT", "RDNTIRT", 
+    "NOTIRT", "CVXIRT", "XTZIRT", "FILIRT", "UMAIRT", "1B_BABYDOGEIRT", "BANDIRT", "SSVIRT", 
+    "DAOIRT", "BLURIRT", "GMXIRT", "SKLIRT", "SNTIRT", "NMRIRT", "API3IRT", "WLDIRT", 
+    "SOLIRT", "QNTIRT", "FETIRT", "AGIXIRT", "LPTIRT", "SLPIRT", "COMPIRT", "MEMEIRT", 
+    "BATIRT", "TRBIRT", "AGLDIRT", "MDTIRT", "LRCIRT", "BICOIRT", "MAGICIRT", "ETHFIIRT", 
+    "1INCHIRT", "1M_NFTIRT", "ARBIRT", "BALIRT", "TONIRT", "CELRIRT", "ALGOIRT", "MASKIRT", 
+    "EGALAIRT", "FLOWIRT", "OMGIRT", "ENJIRT", "DYDXIRT", "JSTIRT", "HMSTRIRT", "MAJORIRT"
+];
+
+// لیست ارزهای دیجیتال موردنظر برای نمایش (دلاری)
+const cryptoCurrenciesUSDT = [
+    "BTCUSDT", "ETHUSDT", "LTCUSDT", "XRPUSDT", "BCHUSDT", "BNBUSDT", "EOSUSDT", 
+    "XLMUSDT", "ETCUSDT", "TRXUSDT", "PMNUSDT", "DOGEUSDT", "UNIUSDT", "DAIUSDT", 
+    "LINKUSDT", "DOTUSDT", "AAVEUSDT", "ADAUSDT", "SHIBUSDT", "FTMUSDT", "MATICUSDT", 
+    "AXSUSDT", "MANAUSDT", "SANDUSDT", "AVAXUSDT", "MKRUSDT", "GMTUSDT", "USDCUSDT", 
+    "BANDUSDT", "COMPUSDT", "HBARUSDT", "WBTCUSDT", "GLMUSDT", "ENSUSDT", "AEVOUSDT", 
+    "RSRUSDT", "API3USDT", "ONEUSDT", "EGALAUSDT", "XTZUSDT", "FLOWUSDT", "CVCUSDT", 
+    "NMRUSDT", "BATUSDT", "TRBUSDT", "RDNTUSDT", "OMUSDT", "YFIUSDT", "QNTUSDT", 
+    "IMXUSDT", "GMXUSDT", "ETHFIUSDT", "GRTUSDT", "WLDUSDT", "NOTUSDT", "MAGICUSDT", 
+    "MEMEUSDT", "SOLUSDT", "BALUSDT", "DAOUSDT", "SNXUSDT", "SSVUSDT", "RNDRUSDT", 
+    "NEARUSDT", "WOOUSDT", "CRVUSDT", "EGLDUSDT", "LPTUSDT", "BICOUSDT", "ANTUSDT", 
+    "1INCHUSDT", "SLPUSDT", "CVXUSDT", "TONUSDT", "BLURUSDT", "CELRUSDT", "DYDXUSDT", 
+    "ZROUSDT", "ARBUSDT", "APTUSDT", "UMAUSDT", "ZRXUSDT", "SUSHIUSDT", "FETUSDT", 
+    "ALGOUSDT", "MASKUSDT", "STORJUSDT", "XMRUSDT", "SNTUSDT", "APEUSDT", "FILUSDT", 
+    "ENJUSDT", "OMGUSDT", "CHZUSDT", "JSTUSDT", "HMSTRUSDT", "MAJORUSDT"
+];
+
+// نام‌های فارسی ارزهای دیجیتال 
+const cryptoNames = {
+    "BTC": "بیت‌کوین",
+    "ETH": "اتریوم",
+    "LTC": "لایت‌کوین",
+    "USDT": "تتر",
+    "XRP": "ریپل",
+    "BCH": "بیت‌کوین‌کش",
+    "BNB": "بایننس‌کوین",
+    "EOS": "ایاس",
+    "XLM": "استلار",
+    "ETC": "اتریوم‌کلاسیک",
+    "TRX": "ترون",
+    "PMN": "پی‌ام‌ان",
+    "DOGE": "دوج‌کوین",
+    "UNI": "یونی‌سواپ",
+    "DAI": "دای",
+    "LINK": "چین‌لینک",
+    "DOT": "پولکادات",
+    "AAVE": "آوه",
+    "ADA": "کاردانو",
+    "SHIB": "شیبا اینو",
+    "FTM": "فانتوم",
+    "MATIC": "پالیگان",
+    "AXS": "اکسی اینفینیتی",
+    "MANA": "مانا (دیسنترالند)",
+    "SAND": "سندباکس",
+    "AVAX": "آوالانچ",
+    "MKR": "میکر",
+    "GMT": "جی‌ام‌تی (StepN)",
+    "USDC": "یو‌اس‌دی‌کوین",
+    "BAND": "بند پروتکل",
+    "COMP": "کامپاند",
+    "HBAR": "هدرا هش‌گراف",
+    "WBTC": "رپد بیت‌کوین",
+    "GLM": "گولم",
+    "ENS": "اتریوم نیم سرویس",
+    "AEVO": "ایوو",
+    "RSR": "ریزرو رایتس",
+    "API3": "ای‌پی‌آی۳",
+    "ONE": "هارمونی وان",
+    "EGALA": "گالا",
+    "XTZ": "تزوس",
+    "FLOW": "فلو",
+    "CVC": "سیویک",
+    "NMR": "نومرای",
+    "BAT": "بیسیک اتنشن توکن",
+    "TRB": "تلور",
+    "RDNT": "رادینت",
+    "OM": "اومیس‌گو",
+    "YFI": "یرن فایننس",
+    "QNT": "کوانت",
+    "IMX": "ایمیوتبل ایکس",
+    "GMX": "جی‌ام‌ایکس",
+    "ETHFI": "اتریوم‌فای",
+    "GRT": "گراف",
+    "WLD": "ورلد‌کوین",
+    "NOT": "نات‌کوین",
+    "MAGIC": "مجیک",
+    "MEME": "میم‌کوین",
+    "SOL": "سولانا",
+    "BAL": "بالانسر",
+    "DAO": "دائو میکر",
+    "SNX": "سینتتیکس",
+    "SSV": "اس‌اس‌وی نتورک",
+    "RNDR": "رندر",
+    "NEAR": "نیر پروتکل",
+    "WOO": "وو نتورک",
+    "CRV": "کرو",
+    "EGLD": "مولتی‌ورس‌ایکس (الروند)",
+    "LPT": "لایو‌پییر",
+    "BICO": "بیکونومی",
+    "ANT": "آراگون",
+    "1INCH": "وان‌اینچ",
+    "SLP": "اسموث لاو پوشن",
+    "CVX": "کانوکس فایننس",
+    "TON": "تون‌کوین",
+    "BLUR": "بلور",
+    "CELR": "سلر نتورک",
+    "DYDX": "دی‌وای‌دی‌اکس",
+    "ZRO": "لایه‌زیرو",
+    "ARB": "آربیتروم",
+    "APT": "آپتوس",
+    "UMA": "یو‌ام‌ای",
+    "ZRX": "زیروایکس",
+    "SUSHI": "سوشی‌سواپ",
+    "FET": "فچ.ای‌آی",
+    "ALGO": "الگوراند",
+    "MASK": "مسک نتورک",
+    "STORJ": "استورج",
+    "XMR": "مونرو",
+    "SNT": "استاتوس",
+    "APE": "ایپ‌کوین",
+    "FIL": "فایل‌کوین",
+    "ENJ": "انجین‌کوین",
+    "OMG": "اومیس‌گو",
+    "CHZ": "چیلیز",
+    "JST": "جاست",
+    "HMSTR": "همستر",
+    "MAJOR": "میجر",
+    "GAL": "گالاکسی",
+    "AGIX": "سینگولاریتی نت",
+    "1M_BTT": "بیت‌تورنت (۱M)",
+    "1M_NFT": "NFT (۱M)",
+    "100K_FLOKI": "فلوکی (100K)",
+    "1B_BABYDOGE": "بیبی‌دوج (1B)"
+};
 
 // مدیریت ناوبری
 function navigateTo(targetSection) {
@@ -76,9 +219,10 @@ document.querySelectorAll('.tab-btn').forEach(tab => {
     });
 });
 
-// فرمت‌بندی اعداد بزرگ
+// فرمت‌بندی اعداد به فارسی
 function formatNumber(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // تبدیل به فرمت فارسی با جداکننده هزارگان
+    return num.toLocaleString('fa-IR');
 }
 
 // نمایش داده‌های قیمت ارز و طلا
@@ -121,42 +265,205 @@ function showCurrencyData() {
                 console.log("داده‌های ارز نمایش داده شد");
             }
             
-            // نمایش داده‌های ارز دیجیتال
-            if (cryptoItemsContainer) {
-                const cryptoHTML = getCryptoDataHTML();
-                cryptoItemsContainer.innerHTML = cryptoHTML;
-                console.log("داده‌های ارز دیجیتال نمایش داده شد");
+            // دریافت و نمایش داده‌های ارز دیجیتال از API
+            fetchCryptoData();
+            
+            // مخفی کردن لودینگ برای طلا و ارزهای خارجی
+            if (currencyLoading) {
+                setTimeout(() => {
+                    currencyLoading.classList.add('hidden');
+                }, 500);
             }
             
         } catch (error) {
             console.error("خطا در نمایش داده‌ها:", error);
             if (currencyError) currencyError.classList.remove('hidden');
-        } finally {
             if (currencyLoading) currencyLoading.classList.add('hidden');
         }
     }, 300);
 }
 
-// ساخت HTML برای داده‌های طلا
+// دریافت داده‌های ارزهای دیجیتال از API نوبیتکس
+async function fetchCryptoData() {
+    try {
+        console.log("دریافت داده‌های ارز دیجیتال از API نوبیتکس");
+        
+        const response = await fetch('https://apiv2.nobitex.ir/v3/orderbook/all');
+        const data = await response.json();
+        
+        if (data && Object.keys(data).length > 0) {
+            console.log("داده‌های ارز دیجیتال دریافت شد");
+            
+            // ساخت HTML ارزهای دیجیتال
+            if (cryptoItemsContainer) {
+                const cryptoHTML = getCryptoDataHTMLFromAPI(data);
+                cryptoItemsContainer.innerHTML = cryptoHTML;
+                console.log("داده‌های ارز دیجیتال نمایش داده شد");
+            }
+            
+            // تنظیم جستجوی ارزهای دیجیتال
+            setupCryptoSearch();
+            
+        } else {
+            throw new Error("داده‌های دریافتی از API معتبر نیستند");
+        }
+    } catch (error) {
+        console.error("خطا در دریافت داده‌های ارز دیجیتال:", error);
+        
+        // استفاده از داده‌های پشتیبان در صورت خطا
+        if (cryptoItemsContainer) {
+            const cryptoHTML = getFallbackCryptoHTML();
+            cryptoItemsContainer.innerHTML = cryptoHTML;
+            console.log("داده‌های پشتیبان ارز دیجیتال نمایش داده شد");
+            
+            // تنظیم جستجوی ارزهای دیجیتال
+            setupCryptoSearch();
+        }
+    } finally {
+        // مخفی کردن لودینگ
+        if (currencyLoading) {
+            currencyLoading.classList.add('hidden');
+        }
+    }
+}
+
+// تنظیم جستجوی ارزهای دیجیتال
+function setupCryptoSearch() {
+    if (cryptoSearch) {
+        cryptoSearch.addEventListener('input', function() {
+            const searchTerm = this.value.trim().toLowerCase();
+            const cryptoItems = document.querySelectorAll('#crypto-items .currency-item');
+            
+            cryptoItems.forEach(item => {
+                const cryptoName = item.querySelector('.currency-name').textContent.toLowerCase();
+                const cryptoSymbol = item.getAttribute('data-symbol').toLowerCase();
+                
+                if (cryptoName.includes(searchTerm) || cryptoSymbol.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+}
+
+// ساخت HTML برای داده‌های ارز دیجیتال از API
+function getCryptoDataHTMLFromAPI(data) {
+    // بررسی ارزهای موجود در API
+    const cryptoList = [];
+    
+    // جمع‌آوری داده‌های ارزها
+    cryptoCurrenciesIRT.forEach(irtSymbol => {
+        // گرفتن نام کوتاه ارز (مثلاً BTC از BTCIRT)
+        const baseSymbol = irtSymbol.replace('IRT', '');
+        
+        // معادل USDT آن
+        const usdtSymbol = baseSymbol + 'USDT';
+        
+        // اگر در داده‌های API موجود باشد
+        if (data[irtSymbol] && data[irtSymbol].lastTradePrice) {
+            const irtPrice = parseInt(data[irtSymbol].lastTradePrice);
+            const usdtPrice = data[usdtSymbol] ? parseFloat(data[usdtSymbol].lastTradePrice) : null;
+            
+            // نام فارسی ارز
+            const shortSymbol = baseSymbol.replace(/^1[BKM]_/, ''); // حذف پیشوندهای 1B_، 1K_، 1M_
+            const name = cryptoNames[shortSymbol] || shortSymbol;
+            
+            cryptoList.push({
+                symbol: baseSymbol,
+                name: name,
+                irtPrice: irtPrice,
+                usdtPrice: usdtPrice
+            });
+        }
+    });
+    
+    // اگر هیچ ارزی یافت نشد
+    if (cryptoList.length === 0) {
+        return '<p class="no-data">اطلاعات ارزهای دیجیتال در دسترس نیست</p>';
+    }
+    
+    // مرتب‌سازی بر اساس اهمیت (BTC و ETH اول، بقیه به ترتیب الفبا)
+    cryptoList.sort((a, b) => {
+        if (a.symbol === 'BTC') return -1;
+        if (b.symbol === 'BTC') return 1;
+        if (a.symbol === 'ETH') return -1;
+        if (b.symbol === 'ETH') return 1;
+        return a.name.localeCompare(b.name);
+    });
+    
+    // ساخت HTML برای هر ارز دیجیتال
+    return cryptoList.map(crypto => {
+        // تبدیل قیمت ریال به تومان
+        const tomanPrice = Math.floor(crypto.irtPrice / 10);
+        
+        // نمایش قیمت ریالی (تومانی)
+        const irtPriceHtml = `<div class="crypto-price-irt">${formatNumber(tomanPrice)} <span class="crypto-unit">تومان</span></div>`;
+        
+        // نمایش قیمت دلاری
+        const usdtPriceHtml = crypto.usdtPrice 
+            ? `<div class="crypto-price-usdt">${formatNumber(crypto.usdtPrice)} <span class="crypto-unit">دلار</span></div>` 
+            : '';
+        
+        return `
+            <div class="currency-item crypto" data-symbol="${crypto.symbol}">
+                <div class="currency-header">
+                    <span class="currency-name">${crypto.name}</span>
+                    <span class="currency-symbol">${crypto.symbol}</span>
+                </div>
+                <div class="crypto-prices">
+                    ${irtPriceHtml}
+                    ${usdtPriceHtml}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ساخت HTML برای داده‌های پشتیبان ارز دیجیتال
+function getFallbackCryptoHTML() {
+    const cryptoData = [
+        { symbol: "BTC", name: "بیت‌کوین", tomanPrice: 6420000000, usdPrice: 63800 },
+        { symbol: "ETH", name: "اتریوم", tomanPrice: 420000000, usdPrice: 3700 },
+        { symbol: "USDT", name: "تتر", tomanPrice: 102000, usdPrice: 1.00 },
+        { symbol: "XRP", name: "ریپل", tomanPrice: 18500, usdPrice: 0.65 },
+        { symbol: "BNB", name: "بایننس‌کوین", tomanPrice: 63500000, usdPrice: 620 },
+        { symbol: "ADA", name: "کاردانو", tomanPrice: 12800, usdPrice: 0.45 },
+        { symbol: "SOL", name: "سولانا", tomanPrice: 31400000, usdPrice: 300 },
+        { symbol: "DOGE", name: "دوج‌کوین", tomanPrice: 3880, usdPrice: 0.12 }
+    ];
+    
+    return cryptoData.map(crypto => {
+        return `
+            <div class="currency-item crypto" data-symbol="${crypto.symbol}">
+                <div class="currency-header">
+                    <span class="currency-name">${crypto.name}</span>
+                    <span class="currency-symbol">${crypto.symbol}</span>
+                </div>
+                <div class="crypto-prices">
+                    <div class="crypto-price-irt">${formatNumber(crypto.tomanPrice)} <span class="crypto-unit">تومان</span></div>
+                    <div class="crypto-price-usdt">${formatNumber(crypto.usdPrice)} <span class="crypto-unit">دلار</span></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ساخت HTML برای داده‌های طلا - بدون نمایش تغییرات
 function getGoldDataHTML() {
     const goldData = [
-        { name: "طلای 18 عیار", price: 8620500, change: 15000, unit: "تومان" },
-        { name: "طلای 24 عیار", price: 11494000, change: 20000, unit: "تومان" },
-        { name: "انس طلا", price: 2610, change: 5, unit: "دلار" },
-        { name: "سکه امامی", price: 92010000, change: 250000, unit: "تومان" },
-        { name: "سکه بهار آزادی", price: 90500000, change: 200000, unit: "تومان" },
-        { name: "نیم سکه", price: 51000000, change: 120000, unit: "تومان" },
-        { name: "ربع سکه", price: 31000000, change: 80000, unit: "تومان" },
-        { name: "سکه گرمی", price: 18500000, change: 40000, unit: "تومان" }
+        { name: "طلای 18 عیار", price: 8620500, unit: "تومان" },
+        { name: "طلای 24 عیار", price: 11494000, unit: "تومان" },
+        { name: "انس طلا", price: 2610, unit: "دلار" },
+        { name: "سکه امامی", price: 92010000, unit: "تومان" },
+        { name: "سکه بهار آزادی", price: 90500000, unit: "تومان" },
+        { name: "نیم سکه", price: 51000000, unit: "تومان" },
+        { name: "ربع سکه", price: 31000000, unit: "تومان" },
+        { name: "سکه گرمی", price: 18500000, unit: "تومان" }
     ];
     
     return goldData.map(item => {
-        const changeClass = item.change > 0 ? 'change-up' : 
-                          item.change < 0 ? 'change-down' : 'change-neutral';
-        
-        const changeIcon = item.change > 0 ? 'arrow_upward' : 
-                         item.change < 0 ? 'arrow_downward' : 'remove';
-        
         return `
             <div class="currency-item gold">
                 <div class="currency-header">
@@ -165,37 +472,25 @@ function getGoldDataHTML() {
                 <div class="currency-price">
                     ${formatNumber(item.price)} <span class="currency-unit">${item.unit}</span>
                 </div>
-                <div class="currency-changes">
-                    <span class="${changeClass}">
-                        <i class="material-icons change-icon">${changeIcon}</i>
-                        ${item.change > 0 ? '+' : ''}${formatNumber(item.change)}
-                    </span>
-                </div>
             </div>
         `;
     }).join('');
 }
 
-// ساخت HTML برای داده‌های ارز
+// ساخت HTML برای داده‌های ارز - بدون نمایش تغییرات
 function getCurrencyDataHTML() {
     const currencyData = [
-        { name: "دلار آمریکا", price: 101640, change: 140, unit: "تومان" },
-        { name: "یورو", price: 118660, change: 180, unit: "تومان" },
-        { name: "پوند انگلیس", price: 136920, change: 220, unit: "تومان" },
-        { name: "درهم امارات", price: 27852, change: 45, unit: "تومان" },
-        { name: "لیر ترکیه", price: 2480, change: -20, unit: "تومان" },
-        { name: "دلار کانادا", price: 76000, change: 120, unit: "تومان" },
-        { name: "دلار استرالیا", price: 70000, change: 90, unit: "تومان" },
-        { name: "یوآن چین", price: 14240, change: 30, unit: "تومان" }
+        { name: "دلار آمریکا", price: 101640, unit: "تومان" },
+        { name: "یورو", price: 118660, unit: "تومان" },
+        { name: "پوند انگلیس", price: 136920, unit: "تومان" },
+        { name: "درهم امارات", price: 27852, unit: "تومان" },
+        { name: "لیر ترکیه", price: 2480, unit: "تومان" },
+        { name: "دلار کانادا", price: 76000, unit: "تومان" },
+        { name: "دلار استرالیا", price: 70000, unit: "تومان" },
+        { name: "یوآن چین", price: 14240, unit: "تومان" }
     ];
     
     return currencyData.map(item => {
-        const changeClass = item.change > 0 ? 'change-up' : 
-                          item.change < 0 ? 'change-down' : 'change-neutral';
-        
-        const changeIcon = item.change > 0 ? 'arrow_upward' : 
-                         item.change < 0 ? 'arrow_downward' : 'remove';
-        
         return `
             <div class="currency-item forex">
                 <div class="currency-header">
@@ -203,49 +498,6 @@ function getCurrencyDataHTML() {
                 </div>
                 <div class="currency-price">
                     ${formatNumber(item.price)} <span class="currency-unit">${item.unit}</span>
-                </div>
-                <div class="currency-changes">
-                    <span class="${changeClass}">
-                        <i class="material-icons change-icon">${changeIcon}</i>
-                        ${item.change > 0 ? '+' : ''}${formatNumber(item.change)}
-                    </span>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// ساخت HTML برای داده‌های ارز دیجیتال
-function getCryptoDataHTML() {
-    const cryptoData = [
-        { name: "بیت کوین", price: 6420000000, change: 8000000, unit: "تومان" },
-        { name: "اتریوم", price: 420000000, change: 2500000, unit: "تومان" },
-        { name: "تتر", price: 102000, change: 150, unit: "تومان" },
-        { name: "ریپل", price: 1780000, change: 12000, unit: "تومان" },
-        { name: "بایننس کوین", price: 12600000, change: 80000, unit: "تومان" },
-        { name: "کاردانو", price: 150000, change: 3000, unit: "تومان" }
-    ];
-    
-    return cryptoData.map(item => {
-        const changeClass = item.change > 0 ? 'change-up' : 
-                          item.change < 0 ? 'change-down' : 'change-neutral';
-        
-        const changeIcon = item.change > 0 ? 'arrow_upward' : 
-                         item.change < 0 ? 'arrow_downward' : 'remove';
-        
-        return `
-            <div class="currency-item crypto">
-                <div class="currency-header">
-                    <span class="currency-name">${item.name}</span>
-                </div>
-                <div class="currency-price">
-                    ${formatNumber(item.price)} <span class="currency-unit">${item.unit}</span>
-                </div>
-                <div class="currency-changes">
-                    <span class="${changeClass}">
-                        <i class="material-icons change-icon">${changeIcon}</i>
-                        ${item.change > 0 ? '+' : ''}${formatNumber(item.change)}
-                    </span>
                 </div>
             </div>
         `;
@@ -260,6 +512,8 @@ const convertBtn = document.getElementById('convert-btn');
 const resultContainer = document.getElementById('result-container');
 const numericResult = document.getElementById('numeric-result');
 const textResult = document.getElementById('text-result');
+const copyNumericBtn = document.getElementById('copy-numeric');
+const copyTextBtn = document.getElementById('copy-text');
 
 // تنظیم متن لیبل براساس نوع تبدیل
 conversionTypeSelect?.addEventListener('change', function() {
@@ -271,48 +525,158 @@ conversionTypeSelect?.addEventListener('change', function() {
     if (resultContainer) resultContainer.classList.add('hidden');
 });
 
+// رویداد ورودی عدد با فرمت‌دهی خودکار
+let rawNumber = '';
+
+// تبدیل اعداد فارسی به انگلیسی
+function convertPersianToEnglishNumbers(input) {
+    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    for (let i = 0; i < 10; i++) {
+        const regex = new RegExp(persianNumbers[i], 'g');
+        input = input.replace(regex, englishNumbers[i]);
+    }
+    return input;
+}
+
+amountInput?.addEventListener('input', function(e) {
+    this.value = convertPersianToEnglishNumbers(this.value);
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    
+    // پاکسازی ورودی از کاراکترهای غیر عددی
+    rawNumber = this.value.replace(/[^\d]/g, '');
+    
+    if (rawNumber === '') {
+        this.value = '';
+        return;
+    }
+    
+    // فرمت‌دهی با جداکننده هزارگان
+    let formattedValue = '';
+    for (let i = 0; i < rawNumber.length; i++) {
+        if (i > 0 && (rawNumber.length - i) % 3 === 0) {
+            formattedValue += ',';
+        }
+        formattedValue += rawNumber[i];
+    }
+    
+    this.value = formattedValue;
+    
+    // حفظ موقعیت کرسر
+    const commasBefore = formattedValue.substring(0, start).split(',').length - 1;
+    this.setSelectionRange(start + commasBefore, end + commasBefore);
+});
+
 // رویداد کلیک دکمه تبدیل
 convertBtn?.addEventListener('click', function() {
-    const inputVal = amountInput?.value.replace(/[^\d]/g, '') || '0';
-    if (!inputVal || inputVal === '0') {
+    const inputValue = rawNumber || amountInput?.value.replace(/[^\d]/g, '') || '0';
+    
+    if (!inputValue || inputValue === '0') {
         alert('لطفاً یک عدد وارد کنید');
         return;
     }
     
     let result, textVal;
     if (conversionTypeSelect?.value === 'toman-to-rial') {
-        result = parseInt(inputVal) * 10;
-        textVal = numToText(result) + ' ریال';
-        if (numericResult) numericResult.textContent = formatNumber(result) + ' ریال';
+        result = BigInt(inputValue) * BigInt(10);
+        if (numericResult) numericResult.textContent = formatNumber(result.toString()) + ' ریال';
+        if (textResult) textResult.textContent = `${numberToWords(result.toString())} ریال`;
     } else {
-        result = Math.floor(parseInt(inputVal) / 10);
-        textVal = numToText(result) + ' تومان';
-        if (numericResult) numericResult.textContent = formatNumber(result) + ' تومان';
+        result = BigInt(inputValue) / BigInt(10);
+        if (numericResult) numericResult.textContent = formatNumber(result.toString()) + ' تومان';
+        if (textResult) textResult.textContent = `${numberToWords(result.toString())} تومان`;
     }
     
-    if (textResult) textResult.textContent = textVal;
     if (resultContainer) resultContainer.classList.remove('hidden');
 });
 
-// تبدیل عدد به متن (نسخه ساده‌شده)
-function numToText(num) {
-    const ones = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
-    const teens = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
-    const tens = ['', 'ده', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
-    
-    if (num === 0) return 'صفر';
-    if (num < 10) return ones[num];
-    if (num < 20) return teens[num - 10];
-    if (num < 100) {
-        const ten = Math.floor(num / 10);
-        const one = num % 10;
-        return ones[one] ? tens[ten] + ' و ' + ones[one] : tens[ten];
-    }
-    
-    return num.toLocaleString('fa-IR') + ' (متن عدد خیلی بزرگ است)';
+// کپی کردن نتایج
+copyNumericBtn?.addEventListener('click', function() {
+    copyToClipboard(numericResult.textContent);
+    showToast('نتیجه عددی کپی شد');
+});
+
+copyTextBtn?.addEventListener('click', function() {
+    copyToClipboard(textResult.textContent);
+    showToast('نتیجه متنی کپی شد');
+});
+
+function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
 }
 
-// شروع خودکار نمایش داده‌های ارزی بعد از بارگذاری صفحه
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.classList.add('toast');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 2000);
+    }, 100);
+}
+
+// تبدیل عدد به متن
+const units = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
+const teens = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
+const tens = ['', 'ده', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
+const hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
+const scales = ['', 'هزار', 'میلیون', 'میلیارد', 'تریلیون', 'کوادریلیون'];
+
+function numberToWords(numStr) {
+    if (numStr === '0') return 'صفر';
+    let words = '';
+    let scaleIndex = 0;
+    for (let i = numStr.length; i > 0; i -= 3) {
+        const start = Math.max(0, i - 3);
+        const chunk = parseInt(numStr.substring(start, i), 10);
+        if (chunk !== 0) {
+            const chunkWords = convertChunkToWords(chunk);
+            words = chunkWords + (scaleIndex > 0 ? ' ' + scales[scaleIndex] : '') + 
+                   (words ? ' و ' + words : '');
+        }
+        scaleIndex++;
+    }
+    return words;
+}
+
+function convertChunkToWords(chunk) {
+    let result = '';
+    const hundred = Math.floor(chunk / 100);
+    if (hundred > 0) {
+        result += hundreds[hundred];
+    }
+    const remainder = chunk % 100;
+    if (remainder > 0) {
+        if (result.length > 0) result += ' و ';
+        if (remainder < 10) {
+            result += units[remainder];
+        } else if (remainder < 20) {
+            result += teens[remainder - 10];
+        } else {
+            const ten = Math.floor(remainder / 10);
+            const unit = remainder % 10;
+            result += tens[ten];
+            if (unit > 0) {
+                result += ' و ' + units[unit];
+            }
+        }
+    }
+    return result;
+}
+
+// شروع خودکار نمایش داده‌ها
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded: صفحه بارگذاری شد');
     
@@ -323,6 +687,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // افزودن رویداد برای دکمه تلاش مجدد
     document.getElementById('retry-btn')?.addEventListener('click', showCurrencyData);
+    
+    // تنظیم جستجوی ارز
+    document.getElementById('currency-search')?.addEventListener('input', function() {
+        const searchTerm = this.value.trim().toLowerCase();
+        const items = document.querySelectorAll('#currency-items .currency-item');
+        
+        items.forEach(item => {
+            const name = item.querySelector('.currency-name').textContent.toLowerCase();
+            if (name.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
 });
 
 // بارگذاری مجدد در حالت سرویس کارگر
@@ -334,20 +713,16 @@ window.addEventListener('load', function() {
         if (!document.getElementById('currency-page').classList.contains('hidden')) {
             showCurrencyData();
         }
+        
+        // مخفی کردن لودینگ اگر همچنان نمایش داده می‌شود
+        if (currencyLoading && !currencyLoading.classList.contains('hidden')) {
+            currencyLoading.classList.add('hidden');
+        }
     }, 500);
 });
 
-// تنظیم جستجوی ارز
-document.getElementById('currency-search')?.addEventListener('input', function() {
-    const searchTerm = this.value.trim().toLowerCase();
-    const items = document.querySelectorAll('#currency-items .currency-item');
-    
-    items.forEach(item => {
-        const name = item.querySelector('.currency-name').textContent.toLowerCase();
-        if (name.includes(searchTerm)) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-});
+// برقراری ارتباط با تلگرام
+if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.expand();
+    window.Telegram.WebApp.ready();
+}
