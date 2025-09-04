@@ -484,10 +484,30 @@ input::placeholder {
     cursor: pointer;
     transition: all 0.3s;
 }
-.tab-btn.active {
-    color: #2E7D32;
-    border-bottom-color: #2E7D32;
+
+/* رنگ‌های مختلف برای تب‌ها */
+.tab-gold {
+    color: #b8860b;
 }
+.tab-gold.active {
+    color: #FFD700;
+    border-bottom-color: #FFD700;
+}
+.tab-forex {
+    color: #388E3C;
+}
+.tab-forex.active {
+    color: #4CAF50;
+    border-bottom-color: #4CAF50;
+}
+.tab-crypto {
+    color: #303F9F;
+}
+.tab-crypto.active {
+    color: #3F51B5;
+    border-bottom-color: #3F51B5;
+}
+
 .tab-btn:hover:not(.active) {
     background-color: rgba(0,0,0,0.03);
     color: #333;
@@ -587,8 +607,6 @@ input::placeholder {
 .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(46, 125, 50, 0.2);
-    border-top-color: #2E7D32;
     border-radius: 50%;
     animation: spin 1s infinite linear;
     margin-bottom: 15px;
@@ -742,13 +760,6 @@ body.dark .page-header {
 body.dark .currency-tabs {
     border-bottom-color: #333;
 }
-body.dark .tab-btn {
-    color: #BDBDBD;
-}
-body.dark .tab-btn.active {
-    color: #4CAF50;
-    border-bottom-color: #4CAF50;
-}
 body.dark .search-container input {
     background-color: #2C2C2C;
     border-color: #444;
@@ -801,6 +812,29 @@ body.dark .back-button:active {
 }
 body.dark .app-description p {
     color: #BDBDBD;
+}
+
+/* رنگ‌های تب‌ها در حالت دارک */
+body.dark .tab-gold {
+    color: #D4AF37;
+}
+body.dark .tab-gold.active {
+    color: #FFD700;
+    border-bottom-color: #FFD700;
+}
+body.dark .tab-forex {
+    color: #81C784;
+}
+body.dark .tab-forex.active {
+    color: #4CAF50;
+    border-bottom-color: #4CAF50;
+}
+body.dark .tab-crypto {
+    color: #7986CB;
+}
+body.dark .tab-crypto.active {
+    color: #3F51B5;
+    border-bottom-color: #3F51B5;
 }
 
 /* برای موبایل */
