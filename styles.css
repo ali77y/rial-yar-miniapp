@@ -83,6 +83,9 @@ header {
     align-items: center;
     justify-content: space-between;
 }
+.header-placeholder {
+    flex-grow: 1;
+}
 .theme-btn {
     background: linear-gradient(145deg, #e0e0e0 0%, #fafafa 100%);
     border: none;
@@ -335,23 +338,16 @@ input::placeholder {
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
+}
+.app-logo img {
+    width: 80px;
+    height: 80px;
     animation: pulse 3s infinite;
 }
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
-}
-.app-name {
-    font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
-    font-size: 2rem;
-    margin-bottom: 5px;
-    color: #2E7D32;
-}
-.app-subtitle {
-    font-family: 'BNazanin', Tahoma, Arial, sans-serif;
-    color: #555;
-    font-size: 1rem;
 }
 .menu-options {
     display: flex;
@@ -664,12 +660,6 @@ body.dark .result-box {
 }
 body.dark .result-text {
     color: #90CAF9;
-}
-body.dark .app-name {
-    color: #4CAF50;
-}
-body.dark .app-subtitle {
-    color: #BDBDBD;
 }
 body.dark .menu-option {
     background-color: #2C2C2C;
