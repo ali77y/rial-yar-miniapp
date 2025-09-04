@@ -593,6 +593,21 @@ input::placeholder {
     animation: spin 1s infinite linear;
     margin-bottom: 15px;
 }
+
+/* رنگ‌های مختلف برای لودینگ هر تب */
+.gold-loading .loading-spinner {
+    border: 3px solid rgba(255, 215, 0, 0.2);
+    border-top-color: #FFD700;
+}
+.forex-loading .loading-spinner {
+    border: 3px solid rgba(76, 175, 80, 0.2);
+    border-top-color: #4CAF50;
+}
+.crypto-loading .loading-spinner {
+    border: 3px solid rgba(63, 81, 181, 0.2);
+    border-top-color: #3F51B5;
+}
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
