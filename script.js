@@ -1,855 +1,534 @@
-// تنظیمات اصلی
-const API_URLS = {
-    GOLD: "https://api.tgju.org/v1/data/sana/json",
-    CURRENCY: "https://api.tgju.org/v1/data/sana/json",
-    CRYPTO_NOBITEX: "https://apiv2.nobitex.ir/v3/orderbook/all"
+// تنظیمات اولیه و متغیرهای جهانی
+let activeTab = "gold"; // تب فعال پیش‌فرض
+const apiEndpoints = {
+    gold: "https://api.tgju.org/v1/data/sana/summary/latest",
+    currency: "https://api.tgju.org/v1/data/sana/summary/latest",
+    crypto: "https://apiv2.nobitex.ir/v3/orderbook/all"
 };
 
-// رنگ‌های هر بخش
-const COLORS = {
-    GOLD: "#FFD700",
-    CURRENCY: "#2E8B57",
-    CRYPTO: "#1E90FF"
+const apiKeys = {
+    gold: "your_gold_api_key_if_needed", // در صورت نیاز کلید API را اینجا وارد کنید
+    currency: "your_currency_api_key_if_needed", // در صورت نیاز کلید API را اینجا وارد کنید
 };
 
-// وضعیت نمایش تب‌ها
-let currentTab = "GOLD"; // تب فعال پیش‌فرض
-let loadingStates = {
-    GOLD: false,
-    CURRENCY: false,
-    CRYPTO: false
-};
-
-let priceData = {
-    GOLD: null,
-    CURRENCY: null,
-    CRYPTO: null
-};
-
-// تاریخ آخرین به‌روزرسانی
-let lastUpdates = {
-    GOLD: null,
-    CURRENCY: null,
-    CRYPTO: null
-};
-
-// لیست ارزهای خارجی
-const currencyList = [
-    { id: "USD", title: "دلار (USD)" },
-    { id: "EUR", title: "یورو (EUR)" },
-    { id: "GBP", title: "پوند (GBP)" },
-    { id: "AED", title: "درهم امارات (AED)" },
-    { id: "TRY", title: "لیر ترکیه (TRY)" },
-    { id: "CAD", title: "دلار کانادا (CAD)" },
-    { id: "AUD", title: "دلار استرالیا (AUD)" },
-    { id: "CNY", title: "یوآن چین (CNY)" },
-    { id: "AFN", title: "افغانی (AFN)" },
-    { id: "THB", title: "بات تایلند (THB)" },
-    { id: "AMD", title: "درام ارمنستان (AMD)" },
-    { id: "BHD", title: "دینار بحرین (BHD)" },
-    { id: "IQD", title: "دینار عراق (IQD)" },
-    { id: "KWD", title: "دینار کویت (KWD)" },
-    { id: "RUB", title: "روبل روسیه (RUB)" },
-    { id: "PKR", title: "روپیه پاکستان (PKR)" },
-    { id: "INR", title: "روپیه هند (INR)" },
-    { id: "SAR", title: "ریال عربستان (SAR)" },
-    { id: "OMR", title: "ریال عمان (OMR)" },
-    { id: "QAR", title: "ریال قطر (QAR)" },
-    { id: "MYR", title: "رینگیت مالزی (MYR)" },
-    { id: "CHF", title: "فرانک سوئیس (CHF)" },
-    { id: "SEK", title: "کرون سوئد (SEK)" },
-    { id: "GEL", title: "لاری گرجستان (GEL)" },
-    { id: "SYP", title: "لیر سوریه (SYP)" },
-    { id: "AZN", title: "منات آذربایجان (AZN)" },
-    { id: "JPY", title: "یکصد ین ژاپن (JPY)" }
+// اطلاعات طلا و سکه
+const goldItems = [
+    { id: "geram18", name: "طلای 18 عیار" },
+    { id: "geram24", name: "طلای 24 عیار" },
+    { id: "gold_melted", name: "طلای آب‌شده نقدی" },
+    { id: "ons", name: "انس طلا" },
+    { id: "emami", name: "سکه امامی" },
+    { id: "bahar", name: "سکه بهار آزادی" },
+    { id: "nim", name: "نیم سکه" },
+    { id: "rob", name: "ربع سکه" },
+    { id: "gerami", name: "سکه یک گرمی" }
 ];
 
-// لیست سکه و طلا
-const goldList = [
-    { id: "geram18", title: "طلای 18 عیار" },
-    { id: "geram24", title: "طلای 24 عیار" },
-    { id: "mesghal", title: "طلای آب‌شده نقدی" },
-    { id: "ons", title: "انس طلا" },
-    { id: "emami", title: "سکه امامی" },
-    { id: "bahar", title: "سکه بهار آزادی" },
-    { id: "nim", title: "نیم سکه" },
-    { id: "rob", title: "ربع سکه" },
-    { id: "gerami", title: "سکه یک گرمی" }
+// اطلاعات ارزهای خارجی
+const currencyItems = [
+    { id: "usd", name: "دلار (USD)" },
+    { id: "eur", name: "یورو (EUR)" },
+    { id: "gbp", name: "پوند (GBP)" },
+    { id: "aed", name: "درهم امارات (AED)" },
+    { id: "try", name: "لیر ترکیه (TRY)" },
+    { id: "cad", name: "دلار کانادا (CAD)" },
+    { id: "aud", name: "دلار استرالیا (AUD)" },
+    { id: "cny", name: "یوآن چین (CNY)" },
+    { id: "afn", name: "افغانی (AFN)" },
+    { id: "thb", name: "بات تایلند (THB)" },
+    { id: "amd", name: "درام ارمنستان (AMD)" },
+    { id: "bhd", name: "دینار بحرین (BHD)" },
+    { id: "iqd", name: "دینار عراق (IQD)" },
+    { id: "kwd", name: "دینار کویت (KWD)" },
+    { id: "rub", name: "روبل روسیه (RUB)" },
+    { id: "pkr", name: "روپیه پاکستان (PKR)" },
+    { id: "inr", name: "روپیه هند (INR)" },
+    { id: "sar", name: "ریال عربستان (SAR)" },
+    { id: "omr", name: "ریال عمان (OMR)" },
+    { id: "qar", name: "ریال قطر (QAR)" },
+    { id: "myr", name: "رینگیت مالزی (MYR)" },
+    { id: "chf", name: "فرانک سوئیس (CHF)" },
+    { id: "sek", name: "کرون سوئد (SEK)" },
+    { id: "gel", name: "لاری گرجستان (GEL)" },
+    { id: "syp", name: "لیر سوریه (SYP)" },
+    { id: "azn", name: "منات آذربایجان (AZN)" },
+    { id: "jpy", name: "یکصد ین ژاپن (JPY)" }
 ];
 
-// لیست ارزهای دیجیتال با عنوان فارسی
-const cryptoIRTList = [
-    { id: "BTCIRT", title: "بیت‌کوین" },
-    { id: "ETHIRT", title: "اتریوم" },
-    { id: "LTCIRT", title: "لایت‌کوین" },
-    { id: "USDTIRT", title: "تتر" },
-    { id: "XRPIRT", title: "ریپل" },
-    { id: "BCHIRT", title: "بیت‌کوین‌کش" },
-    { id: "BNBIRT", title: "بایننس‌کوین" },
-    { id: "EOSIRT", title: "ایاس" },
-    { id: "XLMIRT", title: "استلار" },
-    { id: "ETCIRT", title: "اتریوم‌کلاسیک" },
-    { id: "TRXIRT", title: "ترون" },
-    { id: "DOGEIRT", title: "دوج‌کوین" },
-    { id: "UNIIRT", title: "یونی‌سواپ" },
-    { id: "DAIIRT", title: "دای" },
-    { id: "LINKIRT", title: "چین‌لینک" },
-    { id: "DOTIRT", title: "پولکادات" },
-    { id: "AAVEIRT", title: "آوه" },
-    { id: "ADAIRT", title: "کاردانو" },
-    { id: "SHIBIRT", title: "شیبا اینو" },
-    { id: "FTMIRT", title: "فانتوم" },
-    { id: "MATICIRT", title: "پالیگان" },
-    { id: "AXSIRT", title: "اکسی اینفینیتی" },
-    { id: "MANAIRT", title: "مانا (دیسنترالند)" },
-    { id: "SANDIRT", title: "سندباکس" },
-    { id: "AVAXIRT", title: "آوالانچ" },
-    { id: "MKRIRT", title: "میکر" },
-    { id: "GMTIRT", title: "جی‌ام‌تی (StepN)" },
-    { id: "USDCIRT", title: "یو‌اس‌دی‌کوین" },
-    { id: "CHZIRT", title: "چیلیز" },
-    { id: "GRTIRT", title: "گراف" },
-    { id: "CRVIRT", title: "کرو" },
-    { id: "EGLDIRT", title: "مولتی‌ورس‌ایکس (الروند)" },
-    { id: "GALIRT", title: "گالاکسی" },
-    { id: "HBARIRT", title: "هدرا هش‌گراف" },
-    { id: "IMXIRT", title: "ایمیوتبل ایکس" },
-    { id: "WBTCIRT", title: "رپد بیت‌کوین" },
-    { id: "ONEIRT", title: "هارمونی وان" },
-    { id: "ENSIRT", title: "اتریوم نیم سرویس" },
-    { id: "1M_BTTIRT", title: "بیت‌تورنت (۱M)" },
-    { id: "SUSHIIRT", title: "سوشی‌سواپ" },
-    { id: "LDOIRT", title: "لیدو دائو" },
-    { id: "ZROIRT", title: "لایه‌زیرو" },
-    { id: "STORJIRT", title: "استورج" },
-    { id: "ANTIRT", title: "آراگون" },
-    { id: "100K_FLOKIIRT", title: "فلوکی (100K)" },
-    { id: "GLMIRT", title: "گولم" },
-    { id: "OMIRT", title: "اومیس‌گو" },
-    { id: "RDNTIRT", title: "رادینت" },
-    { id: "NOTIRT", title: "نات‌کوین" },
-    { id: "CVXIRT", title: "کانوکس فایننس" },
-    { id: "XTZIRT", title: "تزوس" },
-    { id: "FILIRT", title: "فایل‌کوین" },
-    { id: "UMAIRT", title: "یو‌ام‌ای" },
-    { id: "1B_BABYDOGEIRT", title: "بیبی‌دوج (1B)" },
-    { id: "BANDIRT", title: "بند پروتکل" },
-    { id: "SSVIRT", title: "اس‌اس‌وی نتورک" },
-    { id: "DAOIRT", title: "دائو میکر" },
-    { id: "BLURIRT", title: "بلور" },
-    { id: "GMXIRT", title: "جی‌ام‌ایکس" },
-    { id: "SKLIRT", title: "اسکیل نتورک" },
-    { id: "SNTIRT", title: "استاتوس" },
-    { id: "NMRIRT", title: "نومرای" },
-    { id: "API3IRT", title: "ای‌پی‌آی۳" },
-    { id: "WLDIRT", title: "ورلد‌کوین" },
-    { id: "SOLIRT", title: "سولانا" },
-    { id: "QNTIRT", title: "کوانت" },
-    { id: "FETIRT", title: "فچ.ای‌آی" },
-    { id: "AGIXIRT", title: "سینگولاریتی نت" },
-    { id: "LPTIRT", title: "لایو‌پییر" },
-    { id: "SLPIRT", title: "اسموث لاو پوشن" },
-    { id: "COMPIRT", title: "کامپاند" },
-    { id: "MEMEIRT", title: "میم‌کوین" },
-    { id: "BATIRT", title: "بیسیک اتنشن توکن" },
-    { id: "TRBIRT", title: "تلور" },
-    { id: "AGLDIRT", title: "ادونچر گلد" },
-    { id: "MDTIRT", title: "می‌دیتا" },
-    { id: "LRCIRT", title: "لوپرینگ" },
-    { id: "BICOIRT", title: "بیکونومی" },
-    { id: "MAGICIRT", title: "مجیک" },
-    { id: "ETHFIIRT", title: "اتریوم‌فای" },
-    { id: "1INCHIRT", title: "وان‌اینچ" },
-    { id: "1M_NFTIRT", title: "NFT (۱M)" },
-    { id: "ARBIRT", title: "آربیتروم" },
-    { id: "BALIRT", title: "بالانسر" },
-    { id: "TONIRT", title: "تون‌کوین" },
-    { id: "CELRIRT", title: "سلر نتورک" },
-    { id: "ALGOIRT", title: "الگوراند" },
-    { id: "MASKIRT", title: "مسک نتورک" },
-    { id: "EGALAIRT", title: "گالا" },
-    { id: "FLOWIRT", title: "فلو" },
-    { id: "OMGIRT", title: "اومیس‌گو" },
-    { id: "ENJIRT", title: "انجین‌کوین" },
-    { id: "DYDXIRT", title: "دی‌وای‌دی‌اکس" },
-    { id: "JSTIRT", title: "جاست" },
-    { id: "HMSTRIRT", title: "همستر" },
-    { id: "MAJORIRT", title: "میجر" }
+// اطلاعات ارزهای دیجیتال
+const cryptoItemsIRT = [
+    { id: "BTCIRT", name: "بیت‌کوین" },
+    { id: "ETHIRT", name: "اتریوم" },
+    { id: "LTCIRT", name: "لایت‌کوین" },
+    { id: "USDTIRT", name: "تتر" },
+    { id: "XRPIRT", name: "ریپل" },
+    { id: "BCHIRT", name: "بیت‌کوین‌کش" },
+    { id: "BNBIRT", name: "بایننس‌کوین" },
+    { id: "EOSIRT", name: "ایاس" },
+    { id: "XLMIRT", name: "استلار" },
+    { id: "ETCIRT", name: "اتریوم‌کلاسیک" },
+    { id: "TRXIRT", name: "ترون" },
+    { id: "DOGEIRT", name: "دوج‌کوین" },
+    { id: "UNIIRT", name: "یونی‌سواپ" },
+    { id: "DAIIRT", name: "دای" },
+    { id: "LINKIRT", name: "چین‌لینک" },
+    { id: "DOTIRT", name: "پولکادات" },
+    { id: "AAVEIRT", name: "آوه" },
+    { id: "ADAIRT", name: "کاردانو" },
+    { id: "SHIBIRT", name: "شیبا اینو" },
+    { id: "FTMIRT", name: "فانتوم" },
+    { id: "MATICIRT", name: "پالیگان" },
+    { id: "AXSIRT", name: "اکسی اینفینیتی" },
+    { id: "MANAIRT", name: "مانا (دیسنترالند)" },
+    { id: "SANDIRT", name: "سندباکس" },
+    { id: "AVAXIRT", name: "آوالانچ" },
+    { id: "MKRIRT", name: "میکر" },
+    { id: "GMTIRT", name: "جی‌ام‌تی (StepN)" },
+    { id: "USDCIRT", name: "یو‌اس‌دی‌کوین" },
+    { id: "CHZIRT", name: "چیلیز" },
+    { id: "GRTIRT", name: "گراف" },
+    { id: "CRVIRT", name: "کرو" }
 ];
 
-const cryptoUSDTList = [
-    { id: "BTCUSDT", title: "بیت‌کوین" },
-    { id: "ETHUSDT", title: "اتریوم" },
-    { id: "LTCUSDT", title: "لایت‌کوین" },
-    { id: "XRPUSDT", title: "ریپل" },
-    { id: "BCHUSDT", title: "بیت‌کوین‌کش" },
-    { id: "BNBUSDT", title: "بایننس‌کوین" },
-    { id: "EOSUSDT", title: "ایاس" },
-    { id: "XLMUSDT", title: "استلار" },
-    { id: "ETCUSDT", title: "اتریوم‌کلاسیک" },
-    { id: "TRXUSDT", title: "ترون" },
-    { id: "PMNUSDT", title: "پی‌ام‌ان" },
-    { id: "DOGEUSDT", title: "دوج‌کوین" },
-    { id: "UNIUSDT", title: "یونی‌سواپ" },
-    { id: "DAIUSDT", title: "دای" },
-    { id: "LINKUSDT", title: "چین‌لینک" },
-    { id: "DOTUSDT", title: "پولکادات" },
-    { id: "AAVEUSDT", title: "آوه" },
-    { id: "ADAUSDT", title: "کاردانو" },
-    { id: "SHIBUSDT", title: "شیبا اینو" },
-    { id: "FTMUSDT", title: "فانتوم" },
-    { id: "MATICUSDT", title: "پالیگان" },
-    { id: "AXSUSDT", title: "اکسی اینفینیتی" },
-    { id: "MANAUSDT", title: "مانا (دیسنترالند)" },
-    { id: "SANDUSDT", title: "سندباکس" },
-    { id: "AVAXUSDT", title: "آوالانچ" },
-    { id: "MKRUSDT", title: "میکر" },
-    { id: "GMTUSDT", title: "جی‌ام‌تی (StepN)" },
-    { id: "USDCUSDT", title: "یو‌اس‌دی‌کوین" },
-    { id: "BANDUSDT", title: "بند پروتکل" },
-    { id: "COMPUSDT", title: "کامپاند" },
-    { id: "HBARUSDT", title: "هدرا هش‌گراف" },
-    { id: "WBTCUSDT", title: "رپد بیت‌کوین" },
-    { id: "GLMUSDT", title: "گولم" },
-    { id: "ENSUSDT", title: "اتریوم نیم سرویس" },
-    { id: "AEVOUSDT", title: "ایوو" },
-    { id: "RSRUSDT", title: "ریزرو رایتس" },
-    { id: "API3USDT", title: "ای‌پی‌آی۳" },
-    { id: "ONEUSDT", title: "هارمونی وان" },
-    { id: "EGALAUSDT", title: "گالا" },
-    { id: "XTZUSDT", title: "تزوس" },
-    { id: "FLOWUSDT", title: "فلو" },
-    { id: "CVCUSDT", title: "سیویک" },
-    { id: "NMRUSDT", title: "نومرای" },
-    { id: "BATUSDT", title: "بیسیک اتنشن توکن" },
-    { id: "TRBUSDT", title: "تلور" },
-    { id: "RDNTUSDT", title: "رادینت" },
-    { id: "OMUSDT", title: "اومیس‌گو" },
-    { id: "YFIUSDT", title: "یرن فایننس" },
-    { id: "QNTUSDT", title: "کوانت" },
-    { id: "IMXUSDT", title: "ایمیوتبل ایکس" },
-    { id: "GMXUSDT", title: "جی‌ام‌ایکس" },
-    { id: "ETHFIUSDT", title: "اتریوم‌فای" },
-    { id: "GRTUSDT", title: "گراف" },
-    { id: "WLDUSDT", title: "ورلد‌کوین" },
-    { id: "NOTUSDT", title: "نات‌کوین" },
-    { id: "MAGICUSDT", title: "مجیک" },
-    { id: "MEMEUSDT", title: "میم‌کوین" },
-    { id: "SOLUSDT", title: "سولانا" },
-    { id: "BALUSDT", title: "بالانسر" },
-    { id: "DAOUSDT", title: "دائو میکر" },
-    { id: "SNXUSDT", title: "سینتتیکس" },
-    { id: "SSVUSDT", title: "اس‌اس‌وی نتورک" },
-    { id: "RNDRUSDT", title: "رندر" },
-    { id: "NEARUSDT", title: "نیر پروتکل" },
-    { id: "WOOUSDT", title: "وو نتورک" },
-    { id: "CRVUSDT", title: "کرو" },
-    { id: "EGLDUSDT", title: "مولتی‌ورس‌ایکس (الروند)" },
-    { id: "LPTUSDT", title: "لایو‌پییر" },
-    { id: "BICOUSDT", title: "بیکونومی" },
-    { id: "ANTUSDT", title: "آراگون" },
-    { id: "1INCHUSDT", title: "وان‌اینچ" },
-    { id: "SLPUSDT", title: "اسموث لاو پوشن" },
-    { id: "CVXUSDT", title: "کانوکس فایننس" },
-    { id: "TONUSDT", title: "تون‌کوین" },
-    { id: "BLURUSDT", title: "بلور" },
-    { id: "CELRUSDT", title: "سلر نتورک" },
-    { id: "DYDXUSDT", title: "دی‌وای‌دی‌اکس" },
-    { id: "ZROUSDT", title: "لایه‌زیرو" },
-    { id: "ARBUSDT", title: "آربیتروم" },
-    { id: "APTUSDT", title: "آپتوس" },
-    { id: "UMAUSDT", title: "یو‌ام‌ای" },
-    { id: "ZRXUSDT", title: "زیروایکس" },
-    { id: "SUSHIUSDT", title: "سوشی‌سواپ" },
-    { id: "FETUSDT", title: "فچ.ای‌آی" },
-    { id: "ALGOUSDT", title: "الگوراند" },
-    { id: "MASKUSDT", title: "مسک نتورک" },
-    { id: "STORJUSDT", title: "استورج" },
-    { id: "XMRUSDT", title: "مونرو" },
-    { id: "SNTUSDT", title: "استاتوس" },
-    { id: "APEUSDT", title: "ایپ‌کوین" },
-    { id: "FILUSDT", title: "فایل‌کوین" },
-    { id: "ENJUSDT", title: "انجین‌کوین" },
-    { id: "OMGUSDT", title: "اومیس‌گو" },
-    { id: "CHZUSDT", title: "چیلیز" },
-    { id: "JSTUSDT", title: "جاست" },
-    { id: "HMSTRUSDT", title: "همستر" },
-    { id: "MAJORUSDT", title: "میجر" }
+const cryptoItemsUSDT = [
+    { id: "BTCUSDT", name: "بیت‌کوین" },
+    { id: "ETHUSDT", name: "اتریوم" },
+    { id: "LTCUSDT", name: "لایت‌کوین" },
+    { id: "XRPUSDT", name: "ریپل" },
+    { id: "BCHUSDT", name: "بیت‌کوین‌کش" },
+    { id: "BNBUSDT", name: "بایننس‌کوین" },
+    { id: "EOSUSDT", name: "ایاس" },
+    { id: "XLMUSDT", name: "استلار" },
+    { id: "ETCUSDT", name: "اتریوم‌کلاسیک" },
+    { id: "TRXUSDT", name: "ترون" },
+    { id: "DOGEUSDT", name: "دوج‌کوین" },
+    { id: "UNIUSDT", name: "یونی‌سواپ" },
+    { id: "DAIUSDT", name: "دای" },
+    { id: "LINKUSDT", name: "چین‌لینک" },
+    { id: "DOTUSDT", name: "پولکادات" },
+    { id: "AAVEUSDT", name: "آوه" },
+    { id: "ADAUSDT", name: "کاردانو" },
+    { id: "SHIBUSDT", name: "شیبا اینو" },
+    { id: "FTMUSDT", name: "فانتوم" },
+    { id: "MATICUSDT", name: "پالیگان" },
+    { id: "AXSUSDT", name: "اکسی اینفینیتی" },
+    { id: "MANAUSDT", name: "مانا (دیسنترالند)" },
+    { id: "SANDUSDT", name: "سندباکس" },
+    { id: "AVAXUSDT", name: "آوالانچ" },
+    { id: "MKRUSDT", name: "میکر" },
+    { id: "GMTUSDT", name: "جی‌ام‌تی (StepN)" },
+    { id: "USDCUSDT", name: "یو‌اس‌دی‌کوین" },
+    { id: "SOLUSDT", name: "سولانا" },
+    { id: "APEUSDT", name: "ایپ‌کوین" },
+    { id: "FILUSDT", name: "فایل‌کوین" }
 ];
 
-// تابع اصلی برای شروع برنامه
-document.addEventListener('DOMContentLoaded', function() {
-    // حذف قابلیت زوم
-    document.documentElement.style.touchAction = 'pan-x pan-y';
+// تنظیمات رنگ‌های برنامه
+const tabColors = {
+    gold: "#ffd700",      // رنگ طلایی برای تب طلا
+    currency: "#4CAF50",  // رنگ سبز برای تب ارز خارجی
+    crypto: "#2196F3"     // رنگ آبی برای تب ارز دیجیتال
+};
+
+// کد اصلی اجرا می‌شود وقتی صفحه کامل بارگذاری شد
+document.addEventListener("DOMContentLoaded", function() {
+    // حذف ممنوعیت زوم
+    const metaViewport = document.querySelector('meta[name="viewport"]');
+    if (metaViewport) {
+        metaViewport.content = metaViewport.content.replace(/user-scalable=no/, 'user-scalable=yes');
+    }
     
-    // ایجاد ساختار HTML برای تب‌ها
-    initializeTabs();
-    
-    // تنظیم رویدادها برای کلیک روی تب‌ها
-    setupTabEvents();
-    
-    // بارگذاری داده‌ها برای تب فعال
-    loadDataForTab(currentTab);
-
-    // تغییر عنوان صفحه
-    document.title = "قیمت طلا و ارز";
-});
-
-// ایجاد ساختار HTML تب‌ها
-function initializeTabs() {
-    const tabContainer = document.querySelector('.tabContainer') || createTabContainer();
-    tabContainer.innerHTML = `
-        <div class="tab gold-tab" data-tab="GOLD">طلا و سکه</div>
-        <div class="tab currency-tab" data-tab="CURRENCY">ارزهای خارجی</div>
-        <div class="tab crypto-tab" data-tab="CRYPTO">ارزهای دیجیتال</div>
-    `;
-    
-    // ایجاد محتوای تب‌ها
-    const contentContainer = document.querySelector('.contentContainer') || createContentContainer();
-    contentContainer.innerHTML = `
-        <div id="GOLD" class="tabContent">
-            <div class="loading-container">
-                <div class="loading-spinner gold-spinner"></div>
-                <p class="loading-text">در حال دریافت قیمت‌ها...</p>
-            </div>
-            <div class="price-container"></div>
-        </div>
-        <div id="CURRENCY" class="tabContent" style="display: none;">
-            <div class="loading-container">
-                <div class="loading-spinner currency-spinner"></div>
-                <p class="loading-text">در حال دریافت قیمت‌ها...</p>
-            </div>
-            <div class="price-container"></div>
-        </div>
-        <div id="CRYPTO" class="tabContent" style="display: none;">
-            <div class="loading-container">
-                <div class="loading-spinner crypto-spinner"></div>
-                <p class="loading-text">در حال دریافت قیمت‌ها...</p>
-            </div>
-            <div class="price-container"></div>
-            <div class="crypto-type-selector">
-                <button class="crypto-type-button active" data-type="IRT">تومان (IRT)</button>
-                <button class="crypto-type-button" data-type="USDT">دلار (USDT)</button>
-            </div>
-        </div>
-    `;
-    
-    // اضافه کردن استایل‌ها
-    addStyles();
-}
-
-// ایجاد کانتینر تب‌ها اگر وجود نداشته باشد
-function createTabContainer() {
-    const container = document.createElement('div');
-    container.className = 'tabContainer';
-    document.body.appendChild(container);
-    return container;
-}
-
-// ایجاد کانتینر محتوای تب‌ها اگر وجود نداشته باشد
-function createContentContainer() {
-    const container = document.createElement('div');
-    container.className = 'contentContainer';
-    document.body.appendChild(container);
-    return container;
-}
-
-// اضافه کردن استایل‌ها به صفحه
-function addStyles() {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-        body {
-            font-family: 'Tahoma', 'Arial', sans-serif;
-            direction: rtl;
-            margin: 0;
-            padding: 0;
-            background-color: #1E1E1E;
-            color: #FFFFFF;
-        }
-        
-        .tabContainer {
-            display: flex;
-            justify-content: space-around;
-            background-color: #1E1E1E;
-            border-bottom: 1px solid #333;
-            padding: 10px 0;
-        }
-        
-        .tab {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-            text-align: center;
-            flex: 1;
-        }
-        
-        .tab.active.gold-tab {
-            border-bottom: 2px solid ${COLORS.GOLD};
-            color: ${COLORS.GOLD};
-        }
-        
-        .tab.active.currency-tab {
-            border-bottom: 2px solid ${COLORS.CURRENCY};
-            color: ${COLORS.CURRENCY};
-        }
-        
-        .tab.active.crypto-tab {
-            border-bottom: 2px solid ${COLORS.CRYPTO};
-            color: ${COLORS.CRYPTO};
-        }
-        
-        .tabContent {
-            padding: 15px;
-            min-height: 300px;
-        }
-        
-        .price-item {
-            background-color: #2A2A2A;
-            margin-bottom: 8px;
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-        }
-        
-        .price-item:before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            border-radius: 4px 0 0 4px;
-        }
-        
-        .price-item.gold-item:before {
-            background-color: ${COLORS.GOLD};
-        }
-        
-        .price-item.currency-item:before {
-            background-color: ${COLORS.CURRENCY};
-        }
-        
-        .price-item.crypto-item:before {
-            background-color: ${COLORS.CRYPTO};
-        }
-        
-        .item-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        
-        .item-price {
-            font-size: 1.2em;
-            color: #2E8B57;
-            direction: ltr;
-            text-align: left;
-        }
-        
-        .item-info {
-            margin-top: 5px;
-            font-size: 0.8em;
-            color: #999;
-        }
-        
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100px;
-        }
-        
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top-color: #3498db;
-            animation: spin 1s linear infinite;
-        }
-        
-        .gold-spinner {
-            border-top-color: ${COLORS.GOLD};
-        }
-        
-        .currency-spinner {
-            border-top-color: ${COLORS.CURRENCY};
-        }
-        
-        .crypto-spinner {
-            border-top-color: ${COLORS.CRYPTO};
-        }
-        
-        .loading-text {
-            margin-top: 10px;
-            color: #999;
-        }
-        
-        .last-update {
-            text-align: center;
-            margin: 15px 0;
-            font-size: 0.9em;
-            color: #999;
-        }
-        
-        .crypto-type-selector {
-            display: flex;
-            justify-content: center;
-            margin: 15px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #2A2A2A;
-        }
-        
-        .crypto-type-button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background-color: transparent;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .crypto-type-button.active {
-            background-color: ${COLORS.CRYPTO};
-            color: #1E1E1E;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* تنظیم استایل برای تلفن همراه */
-        @media (max-width: 480px) {
-            .tabContainer {
-                flex-wrap: wrap;
-            }
-            
-            .tab {
-                flex-basis: 33.33%;
-            }
-            
-            .price-item {
-                padding: 12px;
-            }
-            
-            .item-title {
-                font-size: 0.9em;
-            }
-            
-            .item-price {
-                font-size: 1em;
-            }
-        }
-    `;
-    document.head.appendChild(styleElement);
-}
-
-// تنظیم رویدادها برای کلیک روی تب‌ها
-function setupTabEvents() {
-    const tabs = document.querySelectorAll('.tab');
+    // بدست آوردن تمام المنت‌های تب و اضافه کردن رویداد کلیک
+    const tabs = document.querySelectorAll(".tab-item");
     tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const tabId = this.getAttribute('data-tab');
+        tab.addEventListener("click", function() {
+            const tabId = this.dataset.tab;
             switchTab(tabId);
         });
     });
     
-    // تنظیم رویدادها برای دکمه‌های انتخاب نوع ارز دیجیتال
-    const cryptoButtons = document.querySelectorAll('.crypto-type-button');
-    cryptoButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const type = this.getAttribute('data-type');
-            document.querySelectorAll('.crypto-type-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            this.classList.add('active');
-            
-            // بارگذاری مجدد ارزهای دیجیتال با نوع انتخاب شده
-            renderCryptoData(type);
-        });
-    });
+    // تنظیم حالت پیش‌فرض تب فعال
+    const initialActiveTab = document.querySelector('.tab-item[data-tab="gold"]');
+    if (initialActiveTab) {
+        initialActiveTab.classList.add("active");
+        document.getElementById("gold-content").classList.add("active");
+        fetchData("gold");
+    }
     
-    // نشان دادن تب فعال در ابتدا
-    activateTab('GOLD');
-}
+    // تنظیم رنگ تب‌ها و لودینگ‌ها
+    setTabColors();
+});
 
 // تغییر تب فعال
 function switchTab(tabId) {
-    if (currentTab === tabId) return;
+    // پاک کردن کلاس‌های فعال قبلی
+    document.querySelectorAll(".tab-item").forEach(item => {
+        item.classList.remove("active");
+    });
+    document.querySelectorAll(".tab-content").forEach(content => {
+        content.classList.remove("active");
+    });
     
-    currentTab = tabId;
-    activateTab(tabId);
-    loadDataForTab(tabId);
+    // تنظیم تب فعال جدید
+    document.querySelector(`.tab-item[data-tab="${tabId}"]`).classList.add("active");
+    document.getElementById(`${tabId}-content`).classList.add("active");
+    
+    // تنظیم متغیر تب فعال و دریافت داده‌ها
+    activeTab = tabId;
+    fetchData(tabId);
 }
 
-// فعال‌سازی تب مورد نظر
-function activateTab(tabId) {
-    // مخفی کردن همه محتواها و حذف کلاس active از همه تب‌ها
-    document.querySelectorAll('.tabContent').forEach(content => {
-        content.style.display = 'none';
-    });
+// تنظیم رنگ تب‌ها و لودینگ‌ها
+function setTabColors() {
+    // تنظیم رنگ تب‌ها
+    const goldTab = document.querySelector('.tab-item[data-tab="gold"]');
+    const currencyTab = document.querySelector('.tab-item[data-tab="currency"]');
+    const cryptoTab = document.querySelector('.tab-item[data-tab="crypto"]');
     
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
+    if (goldTab) {
+        goldTab.style.borderColor = tabColors.gold;
+    }
+    if (currencyTab) {
+        currencyTab.style.borderColor = tabColors.currency;
+    }
+    if (cryptoTab) {
+        cryptoTab.style.borderColor = tabColors.crypto;
+    }
     
-    // نمایش محتوای تب انتخابی و اضافه کردن کلاس active به تب
-    document.getElementById(tabId).style.display = 'block';
-    document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+    // تنظیم رنگ لودینگ‌ها
+    const goldLoader = document.querySelector('#gold-content .loader-container .loader');
+    const currencyLoader = document.querySelector('#currency-content .loader-container .loader');
+    const cryptoLoader = document.querySelector('#crypto-content .loader-container .loader');
     
-    // تنظیم رنگ‌ها براساس تب فعال
-    const goldTab = document.querySelector('.tab.gold-tab');
-    const currencyTab = document.querySelector('.tab.currency-tab');
-    const cryptoTab = document.querySelector('.tab.crypto-tab');
-    
-    // اضافه کردن کلاس active به تب مورد نظر
-    if (tabId === 'GOLD') {
-        goldTab.classList.add('active');
-    } else if (tabId === 'CURRENCY') {
-        currencyTab.classList.add('active');
-    } else if (tabId === 'CRYPTO') {
-        cryptoTab.classList.add('active');
+    if (goldLoader) {
+        goldLoader.style.borderTopColor = tabColors.gold;
+    }
+    if (currencyLoader) {
+        currencyLoader.style.borderTopColor = tabColors.currency;
+    }
+    if (cryptoLoader) {
+        cryptoLoader.style.borderTopColor = tabColors.crypto;
     }
 }
 
-// بارگذاری داده‌ها برای تب انتخاب شده
-function loadDataForTab(tabId) {
-    // نمایش لودینگ
-    showLoading(tabId);
-    
-    if (tabId === 'GOLD') {
-        fetchGoldData();
-    } else if (tabId === 'CURRENCY') {
-        fetchCurrencyData();
-    } else if (tabId === 'CRYPTO') {
-        fetchCryptoData();
+// نمایش یا مخفی کردن لودر مربوط به یک تب خاص
+function toggleLoader(tabId, show) {
+    const loaderContainer = document.querySelector(`#${tabId}-content .loader-container`);
+    if (loaderContainer) {
+        loaderContainer.style.display = show ? "flex" : "none";
     }
 }
 
-// نمایش انیمیشن لودینگ
-function showLoading(tabId) {
-    loadingStates[tabId] = true;
-    const container = document.getElementById(tabId).querySelector('.loading-container');
-    container.style.display = 'flex';
-}
-
-// مخفی کردن انیمیشن لودینگ
-function hideLoading(tabId) {
-    loadingStates[tabId] = false;
-    const container = document.getElementById(tabId).querySelector('.loading-container');
-    container.style.display = 'none';
+// دریافت داده‌ها بر اساس تب فعال
+function fetchData(tabId) {
+    toggleLoader(tabId, true);
+    
+    // دریافت داده‌ها بسته به نوع تب
+    switch(tabId) {
+        case "gold":
+            fetchGoldData();
+            break;
+        case "currency":
+            fetchCurrencyData();
+            break;
+        case "crypto":
+            fetchCryptoData();
+            break;
+    }
 }
 
 // دریافت داده‌های طلا و سکه
 function fetchGoldData() {
-    fetch(API_URLS.GOLD)
+    fetch(apiEndpoints.gold)
         .then(response => response.json())
         .then(data => {
-            priceData.GOLD = data;
-            lastUpdates.GOLD = new Date();
-            renderGoldData();
-            hideLoading('GOLD');
+            // پردازش داده‌های طلا
+            const goldContainer = document.getElementById("gold-content");
+            goldContainer.innerHTML = "";
+            
+            // ایجاد محتویات لودر
+            const loaderContainer = document.createElement("div");
+            loaderContainer.className = "loader-container";
+            loaderContainer.innerHTML = `
+                <div class="loader" style="border-top-color: ${tabColors.gold}"></div>
+                <p>در حال دریافت قیمت‌ها...</p>
+            `;
+            goldContainer.appendChild(loaderContainer);
+            
+            // ایجاد کارت‌های طلا
+            goldItems.forEach(item => {
+                // جستجو برای پیدا کردن داده مناسب در پاسخ API
+                const priceData = data.sana[item.id] || { p: "نامشخص" };
+                const price = priceData.p ? formatNumber(priceData.p) : "نامشخص";
+                
+                // ایجاد کارت برای هر آیتم
+                const card = document.createElement("div");
+                card.className = "price-card";
+                card.innerHTML = `
+                    <div class="price-card-inner gold">
+                        <h3>${item.name}</h3>
+                        <p class="price">${price} <span class="currency">تومان</span></p>
+                    </div>
+                `;
+                goldContainer.appendChild(card);
+            });
+            
+            // نمایش زمان به‌روزرسانی
+            const lastUpdateTime = new Date();
+            const updateTimeElement = document.createElement("div");
+            updateTimeElement.className = "update-time";
+            updateTimeElement.textContent = `آخرین به‌روزرسانی: ${formatDateTime(lastUpdateTime)}`;
+            goldContainer.appendChild(updateTimeElement);
+            
+            // مخفی کردن لودر
+            toggleLoader("gold", false);
         })
         .catch(error => {
-            console.error('خطا در دریافت قیمت طلا:', error);
-            hideLoading('GOLD');
-            renderError('GOLD', 'خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.');
+            console.error("خطا در دریافت قیمت‌های طلا:", error);
+            displayError("gold", "خطا در دریافت قیمت‌های طلا. لطفاً دوباره تلاش کنید.");
+            toggleLoader("gold", false);
         });
 }
 
-// دریافت داده‌های ارز خارجی
+// دریافت داده‌های ارزهای خارجی
 function fetchCurrencyData() {
-    fetch(API_URLS.CURRENCY)
+    fetch(apiEndpoints.currency)
         .then(response => response.json())
         .then(data => {
-            priceData.CURRENCY = data;
-            lastUpdates.CURRENCY = new Date();
-            renderCurrencyData();
-            hideLoading('CURRENCY');
+            // پردازش داده‌های ارز
+            const currencyContainer = document.getElementById("currency-content");
+            currencyContainer.innerHTML = "";
+            
+            // ایجاد محتویات لودر
+            const loaderContainer = document.createElement("div");
+            loaderContainer.className = "loader-container";
+            loaderContainer.innerHTML = `
+                <div class="loader" style="border-top-color: ${tabColors.currency}"></div>
+                <p>در حال دریافت قیمت‌ها...</p>
+            `;
+            currencyContainer.appendChild(loaderContainer);
+            
+            // ایجاد کارت‌های ارز
+            currencyItems.forEach(item => {
+                // جستجو برای پیدا کردن داده مناسب در پاسخ API
+                const priceData = data.sana[item.id] || { p: "نامشخص" };
+                const price = priceData.p ? formatNumber(priceData.p) : "نامشخص";
+                
+                // ایجاد کارت برای هر آیتم
+                const card = document.createElement("div");
+                card.className = "price-card";
+                card.innerHTML = `
+                    <div class="price-card-inner currency">
+                        <h3>${item.name}</h3>
+                        <p class="price">${price} <span class="currency">تومان</span></p>
+                    </div>
+                `;
+                currencyContainer.appendChild(card);
+            });
+            
+            // نمایش زمان به‌روزرسانی
+            const lastUpdateTime = new Date();
+            const updateTimeElement = document.createElement("div");
+            updateTimeElement.className = "update-time";
+            updateTimeElement.textContent = `آخرین به‌روزرسانی: ${formatDateTime(lastUpdateTime)}`;
+            currencyContainer.appendChild(updateTimeElement);
+            
+            // مخفی کردن لودر
+            toggleLoader("currency", false);
         })
         .catch(error => {
-            console.error('خطا در دریافت قیمت ارز:', error);
-            hideLoading('CURRENCY');
-            renderError('CURRENCY', 'خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.');
+            console.error("خطا در دریافت قیمت‌های ارز:", error);
+            displayError("currency", "خطا در دریافت قیمت‌های ارز. لطفاً دوباره تلاش کنید.");
+            toggleLoader("currency", false);
         });
 }
 
-// دریافت داده‌های ارز دیجیتال
+// دریافت داده‌های ارزهای دیجیتال
 function fetchCryptoData() {
-    fetch(API_URLS.CRYPTO_NOBITEX)
+    fetch(apiEndpoints.crypto)
         .then(response => response.json())
         .then(data => {
-            priceData.CRYPTO = data;
-            lastUpdates.CRYPTO = new Date();
-            const activeType = document.querySelector('.crypto-type-button.active').getAttribute('data-type');
-            renderCryptoData(activeType);
-            hideLoading('CRYPTO');
+            // پردازش داده‌های ارزهای دیجیتال
+            const cryptoContainer = document.getElementById("crypto-content");
+            cryptoContainer.innerHTML = "";
+            
+            // ایجاد محتویات لودر
+            const loaderContainer = document.createElement("div");
+            loaderContainer.className = "loader-container";
+            loaderContainer.innerHTML = `
+                <div class="loader" style="border-top-color: ${tabColors.crypto}"></div>
+                <p>در حال دریافت قیمت‌ها...</p>
+            `;
+            cryptoContainer.appendChild(loaderContainer);
+            
+            // ایجاد بخش ارزهای دیجیتال تومانی
+            const irtSection = document.createElement("div");
+            irtSection.className = "crypto-section";
+            
+            const irtHeader = document.createElement("h2");
+            irtHeader.textContent = "قیمت به تومان";
+            irtHeader.className = "section-header";
+            irtSection.appendChild(irtHeader);
+            
+            // ایجاد کارت‌ها برای ارزهای دیجیتال تومانی
+            cryptoItemsIRT.forEach(item => {
+                if (data.status === 'ok' && data[item.id]) {
+                    const priceData = data[item.id];
+                    let price = "نامشخص";
+                    
+                    if (priceData.lastTradePrice) {
+                        // تبدیل به عدد و فرمت‌بندی
+                        const priceNum = parseInt(priceData.lastTradePrice);
+                        price = formatNumber(priceNum / 10); // تبدیل ریال به تومان
+                    }
+                    
+                    // ایجاد کارت برای هر آیتم
+                    const card = document.createElement("div");
+                    card.className = "price-card";
+                    card.innerHTML = `
+                        <div class="price-card-inner crypto">
+                            <h3>${item.name}</h3>
+                            <p class="price">${price} <span class="currency">تومان</span></p>
+                        </div>
+                    `;
+                    irtSection.appendChild(card);
+                }
+            });
+            
+            cryptoContainer.appendChild(irtSection);
+            
+            // ایجاد بخش ارزهای دیجیتال دلاری
+            const usdtSection = document.createElement("div");
+            usdtSection.className = "crypto-section";
+            
+            const usdtHeader = document.createElement("h2");
+            usdtHeader.textContent = "قیمت به دلار";
+            usdtHeader.className = "section-header";
+            usdtSection.appendChild(usdtHeader);
+            
+            // ایجاد کارت‌ها برای ارزهای دیجیتال دلاری
+            cryptoItemsUSDT.forEach(item => {
+                if (data.status === 'ok' && data[item.id]) {
+                    const priceData = data[item.id];
+                    let price = "نامشخص";
+                    
+                    if (priceData.lastTradePrice) {
+                        // تبدیل به عدد و فرمت‌بندی با حداقل اعشار مورد نیاز
+                        const priceNum = parseFloat(priceData.lastTradePrice);
+                        price = formatCryptoUSDPrice(priceNum);
+                    }
+                    
+                    // ایجاد کارت برای هر آیتم
+                    const card = document.createElement("div");
+                    card.className = "price-card";
+                    card.innerHTML = `
+                        <div class="price-card-inner crypto">
+                            <h3>${item.name}</h3>
+                            <p class="price">${price} <span class="currency">دلار</span></p>
+                        </div>
+                    `;
+                    usdtSection.appendChild(card);
+                }
+            });
+            
+            cryptoContainer.appendChild(usdtSection);
+            
+            // نمایش زمان به‌روزرسانی
+            const lastUpdateTime = new Date();
+            const updateTimeElement = document.createElement("div");
+            updateTimeElement.className = "update-time";
+            updateTimeElement.textContent = `آخرین به‌روزرسانی: ${formatDateTime(lastUpdateTime)}`;
+            cryptoContainer.appendChild(updateTimeElement);
+            
+            // مخفی کردن لودر
+            toggleLoader("crypto", false);
         })
         .catch(error => {
-            console.error('خطا در دریافت قیمت ارز دیجیتال:', error);
-            hideLoading('CRYPTO');
-            renderError('CRYPTO', 'خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.');
+            console.error("خطا در دریافت قیمت‌های ارز دیجیتال:", error);
+            displayError("crypto", "خطا در دریافت قیمت‌های ارز دیجیتال. لطفاً دوباره تلاش کنید.");
+            toggleLoader("crypto", false);
         });
 }
 
-// نمایش داده‌های طلا و سکه
-function renderGoldData() {
-    if (!priceData.GOLD) return;
+// نمایش خطا در صورت بروز مشکل
+function displayError(tabId, message) {
+    const container = document.getElementById(`${tabId}-content`);
     
-    const container = document.querySelector('#GOLD .price-container');
-    container.innerHTML = '';
+    // ایجاد المنت خطا
+    const errorElement = document.createElement("div");
+    errorElement.className = "error-message";
+    errorElement.textContent = message;
     
-    // نمایش زمان آخرین به‌روزرسانی
-    const updateInfo = document.createElement('div');
-    updateInfo.className = 'last-update';
-    updateInfo.innerText = `آخرین به‌روزرسانی: ${formatDateTime(lastUpdates.GOLD)}`;
-    container.appendChild(updateInfo);
-    
-    // نمایش اطلاعات سکه و طلا
-    goldList.forEach(item => {
-        const price = getPriceFromData(priceData.GOLD, item.id);
-        if (price) {
-            const priceElement = createPriceElement(item.title, formatPrice(price), 'gold-item');
-            container.appendChild(priceElement);
-        }
+    // اضافه کردن دکمه تلاش مجدد
+    const retryButton = document.createElement("button");
+    retryButton.textContent = "تلاش مجدد";
+    retryButton.className = "retry-button";
+    retryButton.addEventListener("click", function() {
+        fetchData(tabId);
     });
+    
+    errorElement.appendChild(retryButton);
+    container.appendChild(errorElement);
 }
 
-// نمایش داده‌های ارز خارجی
-function renderCurrencyData() {
-    if (!priceData.CURRENCY) return;
-    
-    const container = document.querySelector('#CURRENCY .price-container');
-    container.innerHTML = '';
-    
-    // نمایش زمان آخرین به‌روزرسانی
-    const updateInfo = document.createElement('div');
-    updateInfo.className = 'last-update';
-    updateInfo.innerText = `آخرین به‌روزرسانی: ${formatDateTime(lastUpdates.CURRENCY)}`;
-    container.appendChild(updateInfo);
-    
-    // نمایش اطلاعات ارزهای خارجی
-    currencyList.forEach(item => {
-        const price = getPriceFromData(priceData.CURRENCY, item.id);
-        if (price) {
-            const priceElement = createPriceElement(item.title, formatPrice(price), 'currency-item');
-            container.appendChild(priceElement);
-        }
-    });
-}
-
-// نمایش داده‌های ارز دیجیتال
-function renderCryptoData(type = 'IRT') {
-    if (!priceData.CRYPTO) return;
-    
-    const container = document.querySelector('#CRYPTO .price-container');
-    container.innerHTML = '';
-    
-    // نمایش زمان آخرین به‌روزرسانی
-    const updateInfo = document.createElement('div');
-    updateInfo.className = 'last-update';
-    updateInfo.innerText = `آخرین به‌روزرسانی: ${formatDateTime(lastUpdates.CRYPTO)}`;
-    container.appendChild(updateInfo);
-    
-    // انتخاب لیست ارزهای مناسب براساس نوع
-    const cryptoList = type === 'IRT' ? cryptoIRTList : cryptoUSDTList;
-    
-    // نمایش اطلاعات ارزهای دیجیتال
-    cryptoList.forEach(item => {
-        const cryptoData = priceData.CRYPTO.data[item.id];
-        if (cryptoData) {
-            let price = cryptoData.lastTradePrice;
-            
-            // فرمت‌بندی قیمت براساس نوع ارز
-            let formattedPrice;
-            if (type === 'IRT') {
-                formattedPrice = formatPrice(price) + ' تومان';
-            } else {
-                // برای ارزهای دلاری، اعداد اعشاری بیش از حد نیاز را حذف می‌کنیم
-                const numPrice = parseFloat(price);
-                if (numPrice >= 1) {
-                    formattedPrice = formatDollarPrice(numPrice, 2);
-                } else {
-                    // برای ارزهای با قیمت کمتر از 1 دلار، 6 رقم اعشار نمایش داده می‌شود
-                    formattedPrice = formatDollarPrice(numPrice, 6);
-                }
-            }
-            
-            const priceElement = createPriceElement(item.title, formattedPrice, 'crypto-item');
-            container.appendChild(priceElement);
-        }
-    });
-}
-
-// نمایش پیام خطا
-function renderError(tabId, message) {
-    const container = document.querySelector(`#${tabId} .price-container`);
-    container.innerHTML = `<div class="error-message">${message}</div>`;
-}
-
-// ایجاد المان قیمت
-function createPriceElement(title, price, className) {
-    const element = document.createElement('div');
-    element.className = `price-item ${className}`;
-    element.innerHTML = `
-        <div class="item-title">${title}</div>
-        <div class="item-price">${price}</div>
-    `;
-    return element;
-}
-
-// دریافت قیمت از داده‌ها
-function getPriceFromData(data, id) {
-    // پیاده‌سازی مناسب براساس ساختار داده‌های API
-    if (data && data[id]) {
-        return data[id].p;
-    }
-    return null;
-}
-
-// فرمت‌بندی قیمت به صورت فارسی
-function formatPrice(price) {
-    if (!price) return '---';
-    
-    // تبدیل به عدد
-    let numPrice;
-    if (typeof price === 'string') {
-        numPrice = parseInt(price.replace(/,/g, ''));
-    } else {
-        numPrice = price;
+// تبدیل عدد به فرمت فارسی با جداکننده هزارگان
+function formatNumber(number) {
+    if (typeof number === 'string') {
+        number = parseFloat(number);
     }
     
-    // فرمت‌بندی با جداکننده هزارتایی
-    return numPrice.toLocaleString('fa-IR') + ' تومان';
+    if (isNaN(number)) {
+        return "نامشخص";
+    }
+    
+    // گرد کردن به نزدیکترین عدد صحیح برای مقادیر بزرگ
+    if (number > 1000) {
+        number = Math.round(number);
+    }
+    
+    // تبدیل به رشته با جداکننده هزارگان
+    return number.toLocaleString('fa-IR');
 }
 
-// فرمت‌بندی قیمت به صورت دلاری
-function formatDollarPrice(price, decimals = 2) {
-    if (!price) return '---';
-    return price.toLocaleString('en-US', { 
-        minimumFractionDigits: 0,
-        maximumFractionDigits: decimals 
-    }) + ' $';
+// فرمت‌بندی قیمت‌های دلاری ارزهای دیجیتال
+function formatCryptoUSDPrice(price) {
+    if (isNaN(price)) {
+        return "نامشخص";
+    }
+    
+    // قیمت‌های بزرگ (مانند بیت‌کوین) بدون اعشار
+    if (price >= 1000) {
+        return Math.floor(price).toLocaleString('en-US');
+    }
+    // قیمت‌های متوسط با دو رقم اعشار
+    else if (price >= 1) {
+        return price.toFixed(2).replace(/\.00$/, '');
+    }
+    // قیمت‌های کوچک با تعداد اعشار مناسب
+    else {
+        let decimals = 6;
+        // برای قیمت‌های بسیار کوچک، اعشار بیشتری نمایش می‌دهیم
+        if (price < 0.0001) {
+            decimals = 8;
+        }
+        return price.toFixed(decimals).replace(/\.?0+$/, '');
+    }
 }
 
-// فرمت‌بندی تاریخ و زمان
+// تبدیل تاریخ به فرمت مناسب نمایش
 function formatDateTime(date) {
-    if (!date) return '---';
-    
-    // تبدیل اعداد به فارسی
-    const options = { 
-        year: 'numeric', 
-        month: 'numeric', 
-        day: 'numeric', 
-        hour: 'numeric', 
-        minute: 'numeric'
+    const options = {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
     };
     
-    return new Intl.DateTimeFormat('fa-IR', options).format(date);
+    return date.toLocaleString('fa-IR', options);
 }
+
+// شروع برنامه با بارگذاری داده‌های پیش‌فرض تب طلا
+fetchData("gold");
