@@ -391,8 +391,8 @@ function getCryptoDataHTMLFromAPI(data) {
             const usdtSymbol = baseSymbol + 'USDT';
             
             // اگر در داده‌های API موجود باشد
-            const irtPrice = parseInt(data[irtSymbol].lastTradePrice);
-            const usdtPrice = data[usdtSymbol] ? parseFloat(data[usdtSymbol].lastTradePrice) : null;
+            const irtPrice = data[irtSymbol].lastTradePrice;
+            const usdtPrice = data[usdtSymbol] ? data[usdtSymbol].lastTradePrice : null;
             
             // نام فارسی ارز
             const shortSymbol = baseSymbol.replace(/^1[BKM]_/, '').replace(/^100K_/, '').replace(/^1B_/, '');
@@ -414,7 +414,7 @@ function getCryptoDataHTMLFromAPI(data) {
         
         // اگر قبلاً اضافه نشده و در داده‌ها موجود است
         if (!cryptoList.some(item => item.symbol === baseSymbol) && data[usdtSymbol] && data[usdtSymbol].lastTradePrice) {
-            const usdtPrice = parseFloat(data[usdtSymbol].lastTradePrice);
+            const usdtPrice = data[usdtSymbol].lastTradePrice;
             
             // نام فارسی ارز
             const shortSymbol = baseSymbol.replace(/^1[BKM]_/, '').replace(/^100K_/, '').replace(/^1B_/, '');
@@ -446,14 +446,18 @@ function getCryptoDataHTMLFromAPI(data) {
     // ساخت HTML برای هر ارز دیجیتال
     return cryptoList.map(crypto => {
         // نمایش قیمت ریالی (تومانی)
-        const irtPriceHtml = crypto.irtPrice 
-            ? `<div class="crypto-price-irt">${formatNumber(Math.floor(crypto.irtPrice / 10))} <span class="crypto-unit">تومان</span></div>` 
-            : '';
+        let irtPriceHtml = '';
+        if (crypto.irtPrice) {
+            // تبدیل قیمت ریال به تومان
+            const tomanPrice = Math.floor(parseInt(crypto.irtPrice) / 10);
+            irtPriceHtml = `<div class="crypto-price-irt">${formatNumber(tomanPrice)} <span class="crypto-unit">تومان</span></div>`;
+        }
         
         // نمایش قیمت دلاری
-        const usdtPriceHtml = crypto.usdtPrice 
-            ? `<div class="crypto-price-usdt">${formatNumber(crypto.usdtPrice)} <span class="crypto-unit">دلار</span></div>` 
-            : '';
+        let usdtPriceHtml = '';
+        if (crypto.usdtPrice) {
+            usdtPriceHtml = `<div class="crypto-price-usdt">${formatNumber(parseFloat(crypto.usdtPrice))} <span class="crypto-unit">دلار</span></div>`;
+        }
         
         return `
             <div class="currency-item crypto" data-symbol="${crypto.symbol}">
@@ -473,21 +477,21 @@ function getCryptoDataHTMLFromAPI(data) {
 // ساخت HTML برای داده‌های پشتیبان ارز دیجیتال
 function getFallbackCryptoHTML() {
     const cryptoData = [
-        { symbol: "BTC", name: "بیت‌کوین", tomanPrice: 6420000000, usdPrice: 63800 },
-        { symbol: "ETH", name: "اتریوم", tomanPrice: 420000000, usdPrice: 3700 },
-        { symbol: "USDT", name: "تتر", tomanPrice: 102000, usdPrice: 1.00 },
-        { symbol: "XRP", name: "ریپل", tomanPrice: 18500, usdPrice: 0.65 },
-        { symbol: "BNB", name: "بایننس‌کوین", tomanPrice: 63500000, usdPrice: 620 },
-        { symbol: "ADA", name: "کاردانو", tomanPrice: 12800, usdPrice: 0.45 },
-        { symbol: "SOL", name: "سولانا", tomanPrice: 31400000, usdPrice: 300 },
-        { symbol: "DOGE", name: "دوج‌کوین", tomanPrice: 3880, usdPrice: 0.12 },
-        { symbol: "SHIB", name: "شیبا اینو", tomanPrice: 120, usdPrice: 0.00012 },
-        { symbol: "DOT", name: "پولکادات", tomanPrice: 1840000, usdPrice: 18.5 },
-        { symbol: "TRX", name: "ترون", tomanPrice: 3500, usdPrice: 0.12 },
-        { symbol: "AVAX", name: "آوالانچ", tomanPrice: 8200000, usdPrice: 75 },
-        { symbol: "MATIC", name: "پالیگان", tomanPrice: 27000, usdPrice: 0.25 },
-        { symbol: "LINK", name: "چین‌لینک", tomanPrice: 2500000, usdPrice: 24.5 },
-        { symbol: "LTC", name: "لایت‌کوین", tomanPrice: 4150000, usdPrice: 41 }
+        { symbol: "BTC", name: "بیت‌کوین", tomanPrice: 11218050000, usdPrice: 109649.88 },
+        { symbol: "ETH", name: "اتریوم", tomanPrice: 690000000, usdPrice: 6750.32 },
+        { symbol: "USDT", name: "تتر", tomanPrice: 102500, usdPrice: 1.00 },
+        { symbol: "XRP", name: "ریپل", tomanPrice: 21850, usdPrice: 0.63 },
+        { symbol: "BNB", name: "بایننس‌کوین", tomanPrice: 68500000, usdPrice: 670.42 },
+        { symbol: "ADA", name: "کاردانو", tomanPrice: 16800, usdPrice: 0.52 },
+        { symbol: "SOL", name: "سولانا", tomanPrice: 34400000, usdPrice: 336.25 },
+        { symbol: "DOGE", name: "دوج‌کوین", tomanPrice: 4350, usdPrice: 0.125 },
+        { symbol: "SHIB", name: "شیبا اینو", tomanPrice: 97, usdPrice: 0.00000945 },
+        { symbol: "DOT", name: "پولکادات", tomanPrice: 1980000, usdPrice: 19.32 },
+        { symbol: "TRX", name: "ترون", tomanPrice: 3870, usdPrice: 0.1275 },
+        { symbol: "AVAX", name: "آوالانچ", tomanPrice: 8750000, usdPrice: 85.35 },
+        { symbol: "MATIC", name: "پالیگان", tomanPrice: 31500, usdPrice: 0.308 },
+        { symbol: "LINK", name: "چین‌لینک", tomanPrice: 2870000, usdPrice: 28.05 },
+        { symbol: "LTC", name: "لایت‌کوین", tomanPrice: 4850000, usdPrice: 47.35 }
     ];
     
     return cryptoData.map(crypto => {
@@ -506,7 +510,7 @@ function getFallbackCryptoHTML() {
     }).join('');
 }
 
-// ساخت HTML برای داده‌های طلا - بدون نمایش تغییرات
+// ساخت HTML برای داده‌های طلا
 function getGoldDataHTML() {
     const goldData = [
         { name: "طلای 18 عیار", price: 8620500, unit: "تومان" },
@@ -533,17 +537,39 @@ function getGoldDataHTML() {
     }).join('');
 }
 
-// ساخت HTML برای داده‌های ارز - بدون نمایش تغییرات
+// ساخت HTML برای داده‌های ارز خارجی
 function getCurrencyDataHTML() {
     const currencyData = [
-        { name: "دلار آمریکا", price: 101640, unit: "تومان" },
-        { name: "یورو", price: 118660, unit: "تومان" },
-        { name: "پوند انگلیس", price: 136920, unit: "تومان" },
-        { name: "درهم امارات", price: 27852, unit: "تومان" },
-        { name: "لیر ترکیه", price: 2480, unit: "تومان" },
-        { name: "دلار کانادا", price: 76000, unit: "تومان" },
-        { name: "دلار استرالیا", price: 70000, unit: "تومان" },
-        { name: "یوآن چین", price: 14240, unit: "تومان" }
+        // ارزهای اصلی
+        { name: "دلار آمریکا (USD)", price: 101640, unit: "تومان" },
+        { name: "یورو (EUR)", price: 118660, unit: "تومان" },
+        { name: "پوند انگلیس (GBP)", price: 136920, unit: "تومان" },
+        { name: "درهم امارات (AED)", price: 27852, unit: "تومان" },
+        { name: "لیر ترکیه (TRY)", price: 2480, unit: "تومان" },
+        { name: "دلار کانادا (CAD)", price: 76000, unit: "تومان" },
+        { name: "دلار استرالیا (AUD)", price: 70000, unit: "تومان" },
+        { name: "یوآن چین (CNY)", price: 14240, unit: "تومان" },
+        
+        // ارزهای اضافی
+        { name: "افغانی (AFN)", price: 1350, unit: "تومان" },
+        { name: "بات تایلند (THB)", price: 3120, unit: "تومان" },
+        { name: "درام ارمنستان (AMD)", price: 254, unit: "تومان" },
+        { name: "دینار بحرین (BHD)", price: 269700, unit: "تومان" },
+        { name: "دینار عراق (IQD)", price: 77, unit: "تومان" },
+        { name: "دینار کویت (KWD)", price: 332000, unit: "تومان" },
+        { name: "روبل روسیه (RUB)", price: 1185, unit: "تومان" },
+        { name: "روپیه پاکستان (PKR)", price: 365, unit: "تومان" },
+        { name: "روپیه هند (INR)", price: 1220, unit: "تومان" },
+        { name: "ریال عربستان (SAR)", price: 27100, unit: "تومان" },
+        { name: "ریال عمان (OMR)", price: 264000, unit: "تومان" },
+        { name: "ریال قطر (QAR)", price: 27900, unit: "تومان" },
+        { name: "رینگیت مالزی (MYR)", price: 23700, unit: "تومان" },
+        { name: "فرانک سوئیس (CHF)", price: 119000, unit: "تومان" },
+        { name: "کرون سوئد (SEK)", price: 10150, unit: "تومان" },
+        { name: "لاری گرجستان (GEL)", price: 37500, unit: "تومان" },
+        { name: "لیر سوریه (SYP)", price: 8, unit: "تومان" },
+        { name: "منات آذربایجان (AZN)", price: 59800, unit: "تومان" },
+        { name: "یکصد ین ژاپن (JPY)", price: 69500, unit: "تومان" }
     ];
     
     return currencyData.map(item => {
@@ -764,13 +790,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // بهبود قابلیت اسکرول در موبایل
-    document.querySelectorAll('.currency-section').forEach(section => {
-        section.style.overflowY = 'auto';
-        section.style.touchAction = 'pan-y';
-        section.style.webkitOverflowScrolling = 'touch';
-    });
 });
 
 // بارگذاری مجدد در حالت سرویس کارگر
@@ -788,26 +807,7 @@ window.addEventListener('load', function() {
             currencyLoading.classList.add('hidden');
         }
     }, 500);
-    
-    // تنظیم اسکرول مناسب برای موبایل
-    enableMobileScrolling();
 });
-
-// فعال‌سازی اسکرول در موبایل
-function enableMobileScrolling() {
-    // افزودن لیسنر برای مدیریت اسکرول در موبایل
-    const sections = document.querySelectorAll('.currency-section');
-    
-    sections.forEach(section => {
-        section.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
-        }, { passive: true });
-        
-        section.addEventListener('touchmove', function(e) {
-            e.stopPropagation();
-        }, { passive: true });
-    });
-}
 
 // برقراری ارتباط با تلگرام
 if (window.Telegram?.WebApp) {
