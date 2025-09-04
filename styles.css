@@ -52,7 +52,6 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    touch-action: manipulation;
 }
 body {
     font-family: 'BNazanin', Tahoma, Arial, sans-serif;
@@ -497,14 +496,8 @@ input::placeholder {
     display: block;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
     max-height: 70vh; /* حداکثر ارتفاع برای اطمینان از قابلیت اسکرول */
     padding-bottom: 20px;
-    -ms-overflow-style: none; /* برای IE و Edge */
-    scrollbar-width: none; /* برای Firefox */
-}
-.currency-section::-webkit-scrollbar {
-    display: none; /* برای Chrome و Safari */
 }
 .currency-section.hidden {
     display: none;
@@ -799,10 +792,7 @@ body.dark .app-description p {
 @media (max-width: 768px) {
     .currency-section {
         -webkit-overflow-scrolling: touch;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        position: relative;
-        height: calc(100vh - 240px); /* ارتفاع مشخص برای اسکرول */
+        overflow-y: auto;
     }
     
     .currency-items {
