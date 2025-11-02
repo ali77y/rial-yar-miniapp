@@ -7,6 +7,7 @@ const goldItemsContainer = document.getElementById('gold-items');
 const currencyItemsContainer = document.getElementById('currency-items');
 const cryptoItemsContainer = document.getElementById('crypto-items');
 const loadingOverlay = document.getElementById('loading-overlay');
+const loadingText = document.getElementById('loading-text'); // نیاز به وجود این المان در HTML
 const currencyError = document.getElementById('currency-error');
 const updateTimeElement = document.getElementById('update-time');
 const cryptoSearch = document.getElementById('crypto-search');
@@ -116,298 +117,178 @@ const cryptoNames = {
     "1M_BTT": "بیت‌تورنت (۱M)", "1M_NFT": "NFT (۱M)", "100K_FLOKI": "فلوکی (100K)", "1B_BABYDOGE": "بیبی‌دوج (1B)"
 };
 
-// مدیریت ناوبری
-function navigateTo(targetSection) {
-    document.querySelectorAll('.page-section').forEach(section => {
-        section.classList.add('hidden');
-    });
-    
-    document.getElementById(targetSection).classList.remove('hidden');
-    
-    if (targetSection === 'currency-page') {
-        loadAllData();
-    }
-}
-
-document.getElementById('goto-converter')?.addEventListener('click', () => navigateTo('converter-page'));
-document.getElementById('goto-currency')?.addEventListener('click', () => navigateTo('currency-page'));
-
-document.querySelectorAll('.back-button').forEach(button => {
-    button.addEventListener('click', function() {
-        const target = this.getAttribute('data-target');
-        if (target) navigateTo(target);
-    });
-});
-
-// سیستم loading جدید
-function showLoading() {
-    console.log('🔄 نمایش loading overlay...');
-    if (loadingOverlay) {
-        loadingOverlay.classList.remove('hidden');
-    }
-}
-
-function hideLoading() {
-    console.log('✅ مخفی کردن loading overlay...');
-    if (loadingOverlay) {
-        loadingOverlay.classList.add('hidden');
-    }
-}
-
-document.querySelectorAll('.tab-btn').forEach(tab => {
-    tab.addEventListener('click', function() {
-        const target = this.getAttribute('data-target');
-        if (!target) return;
-        
-        console.log(`🔄 تغییر تب به: ${target}`);
-        
-        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        
-        document.querySelectorAll('.currency-section').forEach(section => {
-            section.classList.add('hidden');
-        });
-        document.getElementById(target)?.classList.remove('hidden');
-        
-        activeTab = target;
-        
-        if (target === 'gold-section') {
-            showLoading();
-            loadGoldData();
-        } else if (target === 'currency-section') {
-            showLoading();
-            loadCurrencyData();
-        } else if (target === 'crypto-section') {
-            showLoading();
-            loadCryptoData();
-        }
-    });
-});
-
+// --- کمک‌فانکشن‌ها ---
 function formatNumber(num) {
     return num.toLocaleString('fa-IR');
 }
-
 function formatDollarPrice(price, includeDecimal = false) {
     const numPrice = parseFloat(price);
-    
-    if (numPrice >= 10 || !includeDecimal) {
-        return formatNumber(Math.round(numPrice));
-    } else {
-        return formatNumber(Math.round(numPrice * 100) / 100);
-    }
+    if (numPrice >= 10 || !includeDecimal) return formatNumber(Math.round(numPrice));
+    return formatNumber(Math.round(numPrice * 100) / 100);
 }
-
 function gregorianToJalali(g_d, g_m, g_y) {
-    const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    
+    const g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
     let jy = g_y <= 1600 ? 0 : 979;
     g_y -= g_y <= 1600 ? 621 : 1600;
-    
     let gy2 = g_m > 2 ? g_y + 1 : g_y;
-    let days = 365 * g_y + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) +
-               Math.floor((gy2 + 399) / 400) - 80 + g_d + g_d_m[g_m - 1];
-    
-    jy += 33 * Math.floor(days / 12053);
+    let days = 365*g_y + Math.floor((gy2+3)/4) - Math.floor((gy2+99)/100) + Math.floor((gy2+399)/400) - 80 + g_d + g_d_m[g_m-1];
+    jy += 33*Math.floor(days/12053);
     days %= 12053;
-    
-    jy += 4 * Math.floor(days / 1461);
+    jy += 4*Math.floor(days/1461);
     days %= 1461;
-    
     if (days > 365) {
-        jy += Math.floor((days - 1) / 365);
-        days = (days - 1) % 365;
+        jy += Math.floor((days-1)/365);
+        days = (days-1)%365;
     }
-    
-    let jm, jd;
-    if (days < 186) {
-        jm = 1 + Math.floor(days / 31);
-        jd = 1 + days % 31;
-    } else {
-        jm = 7 + Math.floor((days - 186) / 30);
-        jd = 1 + (days - 186) % 30;
-    }
-    
-    return [jy, jm, jd];
+    let jm,jd;
+    if (days < 186) { jm = 1 + Math.floor(days/31); jd = 1 + days%31; }
+    else { jm = 7 + Math.floor((days-186)/30); jd = 1 + (days-186)%30; }
+    return [jy,jm,jd];
 }
-
 function updateLastUpdateTime() {
     const now = new Date();
-    const [jalaliYear, jalaliMonth, jalaliDay] = gregorianToJalali(
-        now.getDate(),
-        now.getMonth() + 1,
-        now.getFullYear()
-    );
-    
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    
-    const persianDate = `${jalaliYear}/${String(jalaliMonth).padStart(2, '0')}/${String(jalaliDay).padStart(2, '0')}`;
-    const persianTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    
-    if (updateTimeElement) {
-        updateTimeElement.textContent = `آخرین به‌روزرسانی: ${persianDate} ساعت ${persianTime}`;
-    }
+    const [jy,jm,jd] = gregorianToJalali(now.getDate(), now.getMonth()+1, now.getFullYear());
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    if (updateTimeElement) updateTimeElement.textContent = `آخرین به‌روزرسانی: ${jy}/${String(jm).padStart(2,'0')}/${String(jd).padStart(2,'0')} ساعت ${hh}:${mm}`;
 }
 
-// تولید داده‌های Real-time
+// --- کنترل overlay با رنگ تب فعلی ---
+function clearOverlayClasses() {
+    if (!loadingOverlay) return;
+    loadingOverlay.classList.remove('overlay-gold','overlay-forex','overlay-crypto');
+}
+function showLoading(section) {
+    if (!loadingOverlay) return;
+    clearOverlayClasses();
+    if (section === 'gold-section') {
+        loadingOverlay.classList.add('overlay-gold');
+        if (loadingText) loadingText.textContent = 'در حال دریافت قیمت‌های طلا و سکه...';
+    } else if (section === 'currency-section') {
+        loadingOverlay.classList.add('overlay-forex');
+        if (loadingText) loadingText.textContent = 'در حال دریافت قیمت‌های ارزهای خارجی...';
+    } else if (section === 'crypto-section') {
+        loadingOverlay.classList.add('overlay-crypto');
+        if (loadingText) loadingText.textContent = 'در حال دریافت قیمت‌های ارزهای دیجیتال...';
+    } else {
+        if (loadingText) loadingText.textContent = 'در حال دریافت قیمت‌ها...';
+    }
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.setAttribute('aria-hidden','false');
+}
+function hideLoading() {
+    if (!loadingOverlay) return;
+    loadingOverlay.classList.add('hidden');
+    loadingOverlay.setAttribute('aria-hidden','true');
+    clearOverlayClasses();
+}
+
+// تولید داده‌های Real-time (فقط برای دمو / fallback)
 function generateRealTimeData() {
-    console.log('🎲 تولید داده‌های Real-time...');
-    
     const now = new Date();
-    const randomFactor = (now.getMinutes() * now.getSeconds() + now.getMilliseconds()) / 100000;
-    
+    const rf = (now.getMinutes()*now.getSeconds() + now.getMilliseconds())/100000;
     return {
-        // طلا و سکه - با تغییرات واقعی
-        '18ayar': Math.round(10593060 + (randomFactor * 100000)),
-        'abshodeh': Math.round(45890 + (randomFactor * 1000)),
-        'usd_xau': Math.round((4002.93 + (randomFactor * 50)) * 100) / 100,
-        'sekkeh': Math.round(111600 + (randomFactor * 2000)),
-        'bahar': Math.round(105100 + (randomFactor * 2000)),
-        'nim': Math.round(58100 + (randomFactor * 1000)),
-        'rob': Math.round(33800 + (randomFactor * 500)),
-        'gerami': Math.round(16500 + (randomFactor * 300)),
-        
-        // ارزهای خارجی - با تغییرات واقعی
-        'usd': Math.round(108750 + (randomFactor * 2000)),
-        'eur': Math.round(126140 + (randomFactor * 2500)),
-        'gbp': Math.round(143060 + (randomFactor * 2800)),
-        'aed': Math.round(29890 + (randomFactor * 600)),
-        'try': Math.round(2590 + (randomFactor * 50)),
-        'cad': Math.round(77390 + (randomFactor * 1500)),
-        'aud': Math.round(71370 + (randomFactor * 1400)),
-        'cny': Math.round(15280 + (randomFactor * 300)),
-        'afn': Math.round(1635 + (randomFactor * 30)),
-        'thb': Math.round(3355 + (randomFactor * 60)),
-        'amd': Math.round(285.14 + (randomFactor * 5)),
-        'bhd': Math.round(289990 + (randomFactor * 5000)),
-        'iqd': Math.round(83.25 + (randomFactor * 2)),
-        'kwd': Math.round(354330 + (randomFactor * 7000)),
-        'rub': Math.round(1355 + (randomFactor * 25)),
-        'pkr': Math.round(385.12 + (randomFactor * 8)),
-        'inr': Math.round(1225 + (randomFactor * 25)),
-        'sar': Math.round(29000 + (randomFactor * 600)),
-        'omr': Math.round(284280 + (randomFactor * 5000)),
-        'qar': Math.round(29920 + (randomFactor * 600)),
-        'myr': Math.round(25970 + (randomFactor * 500)),
-        'chf': Math.round(135060 + (randomFactor * 2700)),
-        'sek': Math.round(11450 + (randomFactor * 200)),
-        'gel': Math.round(40050 + (randomFactor * 800)),
-        'syp': Math.round(9.84 + (randomFactor * 0.2)),
-        'azn': Math.round(63820 + (randomFactor * 1200)),
-        'jpy': Math.round(705 + (randomFactor * 15))
+        '18ayar': Math.round(10593060 + (rf * 100000)),
+        'abshodeh': Math.round(45890 + (rf * 1000)),
+        'usd_xau': Math.round((4002.93 + (rf * 50))*100)/100,
+        'sekkeh': Math.round(111600 + (rf * 2000)),
+        'bahar': Math.round(105100 + (rf * 2000)),
+        'nim': Math.round(58100 + (rf * 1000)),
+        'rob': Math.round(33800 + (rf * 500)),
+        'gerami': Math.round(16500 + (rf * 300)),
+        'usd': Math.round(108750 + (rf * 2000)),
+        'eur': Math.round(126140 + (rf * 2500)),
+        'gbp': Math.round(143060 + (rf * 2800)),
+        'aed': Math.round(29890 + (rf * 600)),
+        'try': Math.round(2590 + (rf * 50)),
+        'cad': Math.round(77390 + (rf * 1500)),
+        'aud': Math.round(71370 + (rf * 1400)),
+        'cny': Math.round(15280 + (rf * 300)),
+        'afn': Math.round(1635 + (rf * 30)),
+        'thb': Math.round(3355 + (rf * 60)),
+        'amd': Math.round(285.14 + (rf * 5)),
+        'bhd': Math.round(289990 + (rf * 5000)),
+        'iqd': Math.round(83.25 + (rf * 2)),
+        'kwd': Math.round(354330 + (rf * 7000)),
+        'rub': Math.round(1355 + (rf * 25)),
+        'pkr': Math.round(385.12 + (rf * 8)),
+        'inr': Math.round(1225 + (rf * 25)),
+        'sar': Math.round(29000 + (rf * 600)),
+        'omr': Math.round(284280 + (rf * 5000)),
+        'qar': Math.round(29920 + (rf * 600)),
+        'myr': Math.round(25970 + (rf * 500)),
+        'chf': Math.round(135060 + (rf * 2700)),
+        'sek': Math.round(11450 + (rf * 200)),
+        'gel': Math.round(40050 + (rf * 800)),
+        'syp': Math.round(9.84 + (rf * 0.2)),
+        'azn': Math.round(63820 + (rf * 1200)),
+        'jpy': Math.round(705 + (rf * 15))
     };
 }
 
+// بارگذاری همه داده‌ها
 async function loadAllData() {
     try {
-        console.log('🚀 شروع loadAllData...');
-        
         if (currencyError) currencyError.classList.add('hidden');
         updateLastUpdateTime();
-        
-        // نمایش loading
-        showLoading();
-        
-        // تولید داده‌های جدید
+
+        // نمایش loading بر اساس تب فعال
+        showLoading(activeTab);
+
+        // دریافت یا تولید داده‌ها (در پروژه واقعی اینجا fetch از API قرار می‌گیرد)
         const apiData = generateRealTimeData();
         globalApiData = apiData;
-        
-        console.log('📊 داده‌ها تولید شد:', apiData);
-        
-        // بارگذاری داده‌ها بر اساس تب فعال
-        if (activeTab === 'gold-section') {
-            await loadGoldDataWithAPI(apiData);
-        } else if (activeTab === 'currency-section') {
-            await loadCurrencyDataWithAPI(apiData);
-        } else if (activeTab === 'crypto-section') {
-            await loadCryptoData();
-        }
-        
-        console.log('✅ loadAllData کامل شد');
-        
-    } catch (error) {
-        console.error('❌ خطا در loadAllData:', error);
+
+        if (activeTab === 'gold-section') await loadGoldDataWithAPI(apiData);
+        else if (activeTab === 'currency-section') await loadCurrencyDataWithAPI(apiData);
+        else if (activeTab === 'crypto-section') await loadCryptoData();
+    } catch (err) {
+        console.error('loadAllData error', err);
         hideLoading();
         if (currencyError) currencyError.classList.remove('hidden');
     }
 }
 
+// بارگذاری طلا با API (یا داده تولیدی)
 async function loadGoldDataWithAPI(apiData) {
     try {
-        console.log('💰 شروع loadGoldDataWithAPI...');
-        
-        if (!goldItemsContainer) {
-            console.log('❌ goldItemsContainer موجود نیست');
-            return;
-        }
-        
+        if (!goldItemsContainer) return;
         const goldHTML = getGoldDataFromAPI(apiData);
-        console.log('📝 Gold HTML generated');
-        
         goldItemsContainer.innerHTML = goldHTML;
-        
-        // مخفی کردن loading با تاخیر کوتاه
-        setTimeout(() => {
-            hideLoading();
-        }, 500);
-        
-        console.log('✅ داده‌های طلا بارگذاری شد');
-        
-    } catch (error) {
-        console.error("❌ خطا در loadGoldDataWithAPI:", error);
+        // اطمینان از مخفی شدن overlay بعد از نمایش
+        setTimeout(() => hideLoading(), 350);
+    } catch (err) {
+        console.error('loadGoldDataWithAPI', err);
         hideLoading();
         if (currencyError) currencyError.classList.remove('hidden');
     }
 }
 
+// بارگذاری ارزها
 async function loadCurrencyDataWithAPI(apiData) {
     try {
-        console.log('💱 شروع loadCurrencyDataWithAPI...');
-        
-        if (!currencyItemsContainer) {
-            console.log('❌ currencyItemsContainer موجود نیست');
-            return;
-        }
-        
+        if (!currencyItemsContainer) return;
         const currencyHTML = getCurrencyDataFromAPI(apiData);
-        console.log('📝 Currency HTML generated');
-        
         currencyItemsContainer.innerHTML = currencyHTML;
-        
-        // مخفی کردن loading با تاخیر کوتاه
-        setTimeout(() => {
-            hideLoading();
-        }, 500);
-        
-        console.log('✅ داده‌های ارز خارجی بارگذاری شد');
-        
-    } catch (error) {
-        console.error("❌ خطا در loadCurrencyDataWithAPI:", error);
+        setTimeout(() => hideLoading(), 350);
+    } catch (err) {
+        console.error('loadCurrencyDataWithAPI', err);
         hideLoading();
         if (currencyError) currencyError.classList.remove('hidden');
     }
 }
 
 async function loadGoldData() {
-    if (globalApiData) {
-        await loadGoldDataWithAPI(globalApiData);
-    } else {
-        await loadAllData();
-    }
+    if (globalApiData) await loadGoldDataWithAPI(globalApiData);
+    else await loadAllData();
 }
-
 async function loadCurrencyData() {
-    if (globalApiData) {
-        await loadCurrencyDataWithAPI(globalApiData);
-    } else {
-        await loadAllData();
-    }
+    if (globalApiData) await loadCurrencyDataWithAPI(globalApiData);
+    else await loadAllData();
 }
 
+// پردازش طلا: به جز 'طلای 18 عیار' و 'انس طلا' بقیه مقادیر *1000 شوند (اضافه شدن 3 صفر)
 function getGoldDataFromAPI(apiData) {
-    console.log('🏆 پردازش داده‌های طلا...');
-    
     const goldSymbols = [
         { key: '18ayar', name: 'طلای 18 عیار', unit: 'تومان' },
         { key: 'abshodeh', name: 'طلای آب‌شده', unit: 'تومان' },
@@ -418,28 +299,37 @@ function getGoldDataFromAPI(apiData) {
         { key: 'rob', name: 'ربع سکه', unit: 'تومان' },
         { key: 'gerami', name: 'سکه یک گرمی', unit: 'تومان' }
     ];
-    
+
     const goldItems = [];
-    
+
     goldSymbols.forEach(symbol => {
-        const price = apiData[symbol.key];
-        
-        if (price && !isNaN(parseFloat(price)) && parseFloat(price) > 0) {
-            goldItems.push({
-                name: symbol.name,
-                price: parseFloat(price),
-                unit: symbol.unit
-            });
-            console.log(`✅ ${symbol.name}: ${formatNumber(price)} ${symbol.unit}`);
+        const raw = apiData[symbol.key];
+        if (raw === undefined || raw === null) {
+            console.log(`❌ ${symbol.key} یافت نشد در apiData`);
+            return;
         }
+        let price = parseFloat(raw);
+        if (isNaN(price)) {
+            console.log(`❌ قیمت ${symbol.key} نامعتبر:`, raw);
+            return;
+        }
+
+        // برای همه موارد به جز 'طلای 18 عیار' و 'انس طلا'، 3 صفر اضافه کن
+        if (symbol.name !== 'طلای 18 عیار' && symbol.name !== 'انس طلا') {
+            price = price * 1000;
+        }
+
+        goldItems.push({
+            name: symbol.name,
+            price: price,
+            unit: symbol.unit
+        });
     });
-    
+
     if (goldItems.length === 0) {
         return '<p class="no-data">❌ اطلاعات طلا و سکه در حال حاضر در دسترس نیست</p>';
     }
-    
-    console.log(`✅ ${goldItems.length} آیتم طلا پردازش شد`);
-    
+
     return goldItems.map(item => {
         return `
             <div class="currency-item gold">
@@ -454,9 +344,8 @@ function getGoldDataFromAPI(apiData) {
     }).join('');
 }
 
+// پردازش ارزهای خارجی
 function getCurrencyDataFromAPI(apiData) {
-    console.log('💱 پردازش داده‌های ارز خارجی...');
-    
     const currencySymbols = [
         { key: 'usd', name: 'دلار آمریکا (USD)', type: 'main' },
         { key: 'eur', name: 'یورو (EUR)', type: 'main' },
@@ -486,28 +375,25 @@ function getCurrencyDataFromAPI(apiData) {
         { key: 'azn', name: 'منات آذربایجان (AZN)', type: 'other' },
         { key: 'jpy', name: 'یکصد ین ژاپن (JPY)', type: 'other' }
     ];
-    
+
     const currencyItems = [];
-    
+
     currencySymbols.forEach(symbol => {
-        const price = apiData[symbol.key];
-        
-        if (price && !isNaN(parseFloat(price)) && parseFloat(price) > 0) {
-            currencyItems.push({
-                name: symbol.name,
-                price: parseFloat(price),
-                type: symbol.type
-            });
-            console.log(`✅ ${symbol.name}: ${formatNumber(price)} تومان`);
-        }
+        const raw = apiData[symbol.key];
+        if (raw === undefined || raw === null) return;
+        const price = parseFloat(raw);
+        if (isNaN(price)) return;
+        currencyItems.push({
+            name: symbol.name,
+            price: price,
+            type: symbol.type
+        });
     });
-    
+
     if (currencyItems.length === 0) {
         return '<p class="no-data">❌ اطلاعات ارزهای خارجی در حال حاضر در دسترس نیست</p>';
     }
-    
-    console.log(`✅ ${currencyItems.length} ارز خارجی پردازش شد`);
-    
+
     return currencyItems.map(item => {
         return `
             <div class="currency-item forex">
@@ -522,139 +408,81 @@ function getCurrencyDataFromAPI(apiData) {
     }).join('');
 }
 
+// --- ارزهای دیجیتال (از نوبیتکس) ---
 async function loadCryptoData() {
     try {
-        console.log('₿ بارگذاری داده‌های ارز دیجیتال...');
-        
         if (cryptoItemsContainer) cryptoItemsContainer.innerHTML = '';
-        
         await fetchCryptoData();
-    } catch (error) {
-        console.error("❌ خطا در بارگذاری داده‌های ارز دیجیتال:", error);
+    } catch (err) {
+        console.error('loadCryptoData', err);
         hideLoading();
         if (currencyError) currencyError.classList.remove('hidden');
     }
 }
-
 async function fetchCryptoData() {
     try {
-        console.log("₿ دریافت داده‌های ارز دیجیتال از API نوبیتکس");
-        
         const response = await fetch('https://apiv2.nobitex.ir/v3/orderbook/all');
         const data = await response.json();
-        
         if (data && Object.keys(data).length > 0) {
-            console.log("✅ داده‌های ارز دیجیتال دریافت شد");
-            
             if (cryptoItemsContainer) {
-                const cryptoHTML = getCryptoDataHTMLFromAPI(data);
-                cryptoItemsContainer.innerHTML = cryptoHTML;
-                console.log("✅ داده‌های ارز دیجیتال نمایش داده شد");
-                
+                cryptoItemsContainer.innerHTML = getCryptoDataHTMLFromAPI(data);
                 setupCryptoSearch();
             }
-            
-        } else {
-            throw new Error("داده‌های دریافتی از API معتبر نیستند");
-        }
-    } catch (error) {
-        console.error("❌ خطا در دریافت داده‌های ارز دیجیتال:", error);
-        
-        if (cryptoItemsContainer) {
-            cryptoItemsContainer.innerHTML = '<p class="no-data">❌ خطا در دریافت اطلاعات ارزهای دیجیتال</p>';
-        }
+        } else throw new Error('invalid crypto data');
+    } catch (err) {
+        console.error('fetchCryptoData', err);
+        if (cryptoItemsContainer) cryptoItemsContainer.innerHTML = '<p class="no-data">❌ خطا در دریافت اطلاعات ارزهای دیجیتال</p>';
     } finally {
-        // مخفی کردن loading با تاخیر کوتاه
-        setTimeout(() => {
-            hideLoading();
-        }, 500);
+        setTimeout(() => hideLoading(), 350);
     }
 }
 
 function setupCryptoSearch() {
-    if (cryptoSearch) {
-        cryptoSearch.addEventListener('input', function() {
-            const searchTerm = this.value.trim().toLowerCase();
-            const cryptoItems = document.querySelectorAll('#crypto-items .currency-item');
-            
-            cryptoItems.forEach(item => {
-                const cryptoName = item.querySelector('.currency-name').textContent.toLowerCase();
-                const cryptoSymbol = item.getAttribute('data-symbol')?.toLowerCase() || '';
-                
-                if (cryptoName.includes(searchTerm) || cryptoSymbol.includes(searchTerm)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+    if (!cryptoSearch) return;
+    cryptoSearch.addEventListener('input', function() {
+        const term = this.value.trim().toLowerCase();
+        const items = document.querySelectorAll('#crypto-items .currency-item');
+        items.forEach(item => {
+            const name = item.querySelector('.currency-name')?.textContent.toLowerCase() || '';
+            const symbol = item.getAttribute('data-symbol')?.toLowerCase() || '';
+            item.style.display = (name.includes(term) || symbol.includes(term)) ? 'flex' : 'none';
         });
-    }
+    });
 }
 
 function getCryptoDataHTMLFromAPI(data) {
     const cryptoList = [];
-    
-    cryptoCurrenciesIRT.forEach(irtSymbol => {
+    for (const irtSymbol of cryptoCurrenciesIRT) {
         if (data[irtSymbol] && data[irtSymbol].lastTradePrice) {
-            const baseSymbol = irtSymbol.replace('IRT', '');
-            const usdtSymbol = baseSymbol + 'USDT';
+            const base = irtSymbol.replace('IRT','');
+            const usdt = base + 'USDT';
             const irtPrice = data[irtSymbol].lastTradePrice;
-            const usdtPrice = data[usdtSymbol] ? data[usdtSymbol].lastTradePrice : null;
-            const shortSymbol = baseSymbol.replace(/^1[BKM]_/, '').replace(/^100K_/, '').replace(/^1B_/, '');
-            const name = cryptoNames[shortSymbol] || shortSymbol;
-            
-            cryptoList.push({
-                symbol: baseSymbol,
-                name: name,
-                irtPrice: irtPrice,
-                usdtPrice: usdtPrice
-            });
+            const usdtPrice = data[usdt] ? data[usdt].lastTradePrice : null;
+            const short = base.replace(/^1[BKM]_/, '').replace(/^100K_/, '').replace(/^1B_/, '');
+            const name = cryptoNames[short] || short;
+            cryptoList.push({ symbol: base, name, irtPrice, usdtPrice });
         }
-    });
-    
-    cryptoCurrenciesUSDT.forEach(usdtSymbol => {
-        const baseSymbol = usdtSymbol.replace('USDT', '');
-        const irtSymbol = baseSymbol + 'IRT';
-        
-        if (!cryptoList.some(item => item.symbol === baseSymbol) && data[usdtSymbol] && data[usdtSymbol].lastTradePrice) {
-            const usdtPrice = data[usdtSymbol].lastTradePrice;
-            const shortSymbol = baseSymbol.replace(/^1[BKM]_/, '').replace(/^100K_/, '').replace(/^1B_/, '');
-            const name = cryptoNames[shortSymbol] || shortSymbol;
-            
-            cryptoList.push({
-                symbol: baseSymbol,
-                name: name,
-                irtPrice: null,
-                usdtPrice: usdtPrice
-            });
-        }
-    });
-    
-    if (cryptoList.length === 0) {
-        return '<p class="no-data">❌ اطلاعات ارزهای دیجیتال در دسترس نیست</p>';
     }
-    
-    cryptoList.sort((a, b) => {
-        if (a.symbol === 'BTC') return -1;
-        if (b.symbol === 'BTC') return 1;
-        if (a.symbol === 'ETH') return -1;
-        if (b.symbol === 'ETH') return 1;
-        return a.name.localeCompare(b.name);
-    });
-    
-    return cryptoList.map(crypto => {
-        let irtPriceHtml = '';
-        if (crypto.irtPrice) {
-            const tomanPrice = Math.floor(parseInt(crypto.irtPrice) / 10);
-            irtPriceHtml = `<div class="crypto-price-irt">${formatNumber(tomanPrice)} <span class="crypto-unit">تومان</span></div>`;
+    for (const usdtSymbol of cryptoCurrenciesUSDT) {
+        const base = usdtSymbol.replace('USDT','');
+        if (!cryptoList.some(i => i.symbol === base) && data[usdtSymbol] && data[usdtSymbol].lastTradePrice) {
+            const name = cryptoNames[base] || base;
+            cryptoList.push({ symbol: base, name, irtPrice: null, usdtPrice: data[usdtSymbol].lastTradePrice });
         }
-        
-        let usdtPriceHtml = '';
+    }
+    if (cryptoList.length === 0) return '<p class="no-data">❌ اطلاعات ارزهای دیجیتال در دسترس نیست</p>';
+    cryptoList.sort((a,b) => (a.symbol==='BTC'?-1:(b.symbol==='BTC'?1:(a.symbol==='ETH'?-1:(b.symbol==='ETH'?1:a.name.localeCompare(b.name))))));
+    return cryptoList.map(crypto => {
+        let irtHtml = '';
+        if (crypto.irtPrice) {
+            const toman = Math.floor(parseInt(crypto.irtPrice)/10);
+            irtHtml = `<div class="crypto-price-irt">${formatNumber(toman)} <span class="crypto-unit">تومان</span></div>`;
+        }
+        let usdtHtml = '';
         if (crypto.usdtPrice) {
             const showDecimal = parseFloat(crypto.usdtPrice) < 10;
-            usdtPriceHtml = `<div class="crypto-price-usdt">${formatDollarPrice(crypto.usdtPrice, showDecimal)} <span class="crypto-unit">دلار</span></div>`;
+            usdtHtml = `<div class="crypto-price-usdt">${formatDollarPrice(crypto.usdtPrice, showDecimal)} <span class="crypto-unit">دلار</span></div>`;
         }
-        
         return `
             <div class="currency-item crypto" data-symbol="${crypto.symbol}">
                 <div class="currency-header">
@@ -662,8 +490,8 @@ function getCryptoDataHTMLFromAPI(data) {
                     <span class="currency-symbol">${crypto.symbol}</span>
                 </div>
                 <div class="crypto-prices">
-                    ${irtPriceHtml}
-                    ${usdtPriceHtml}
+                    ${irtHtml}
+                    ${usdtHtml}
                 </div>
             </div>
         `;
@@ -693,49 +521,30 @@ conversionTypeSelect?.addEventListener('change', function() {
 let rawNumber = '';
 
 function convertPersianToEnglishNumbers(input) {
-    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    for (let i = 0; i < 10; i++) {
-        const regex = new RegExp(persianNumbers[i], 'g');
-        input = input.replace(regex, englishNumbers[i]);
-    }
+    const persianNumbers = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+    const englishNumbers = ['0','1','2','3','4','5','6','7','8','9'];
+    for (let i=0;i<10;i++) input = input.replace(new RegExp(persianNumbers[i],'g'), englishNumbers[i]);
     return input;
 }
 
 amountInput?.addEventListener('input', function(e) {
     this.value = convertPersianToEnglishNumbers(this.value);
-    const start = this.selectionStart;
-    const end = this.selectionEnd;
-    if (e.inputType === 'insertText' && /\d/.test(e.data)) {
-        const cleanValue = this.value.replace(/[^\d]/g, '');
-        rawNumber = cleanValue;
-    } else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
-        rawNumber = this.value.replace(/[^\d]/g, '');
-    } else {
-        rawNumber = this.value.replace(/[^\d]/g, '');
+    const start = this.selectionStart, end = this.selectionEnd;
+    rawNumber = this.value.replace(/[^\d]/g,'');
+    if (rawNumber === '') { this.value = ''; return; }
+    let formatted = '';
+    for (let i=0;i<rawNumber.length;i++) {
+        if (i>0 && (rawNumber.length - i) % 3 === 0) formatted += ',';
+        formatted += rawNumber[i];
     }
-    if (rawNumber === '') {
-        this.value = '';
-        return;
-    }
-    let formattedValue = '';
-    for (let i = 0; i < rawNumber.length; i++) {
-        if (i > 0 && (rawNumber.length - i) % 3 === 0) {
-            formattedValue += ',';
-        }
-        formattedValue += rawNumber[i];
-    }
-    this.value = formattedValue;
-    const commasBefore = formattedValue.substring(0, start).split(',').length - 1;
+    this.value = formatted;
+    const commasBefore = formatted.substring(0,start).split(',').length - 1;
     this.setSelectionRange(start + commasBefore, end + commasBefore);
 });
 
 convertBtn?.addEventListener('click', function() {
-    const inputValue = rawNumber || amountInput?.value.replace(/[^\d]/g, '');
-    if (!inputValue) {
-        alert('لطفاً یک عدد وارد کنید');
-        return;
-    }
+    const inputValue = rawNumber || amountInput?.value.replace(/[^\d]/g,'');
+    if (!inputValue) { alert('لطفاً یک عدد وارد کنید'); return; }
     let rialValue, tomanValue;
     if (conversionTypeSelect?.value === 'toman-to-rial') {
         tomanValue = BigInt(inputValue);
@@ -754,23 +563,14 @@ convertBtn?.addEventListener('click', function() {
 function formatLargeNumber(numStr) {
     let result = '';
     for (let i = 0; i < numStr.length; i++) {
-        if (i > 0 && (numStr.length - i) % 3 === 0) {
-            result += ',';
-        }
+        if (i > 0 && (numStr.length - i) % 3 === 0) result += ',';
         result += numStr[i];
     }
     return result;
 }
 
-copyNumericBtn?.addEventListener('click', function() {
-    copyToClipboard(numericResult.textContent);
-    showToast('نتیجه عددی کپی شد');
-});
-
-copyTextBtn?.addEventListener('click', function() {
-    copyToClipboard(textResult.textContent);
-    showToast('نتیجه متنی کپی شد');
-});
+copyNumericBtn?.addEventListener('click', function() { copyToClipboard(numericResult.textContent); showToast('نتیجه عددی کپی شد'); });
+copyTextBtn?.addEventListener('click', function() { copyToClipboard(textResult.textContent); showToast('نتیجه متنی کپی شد'); });
 
 function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
@@ -797,85 +597,113 @@ function showToast(message) {
     }, 100);
 }
 
+// number-to-words helpers
 const units = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
 const tens = ['', 'ده', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
-const teens = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
-const hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
-const scales = ['', 'هزار', 'میلیون', 'میلیارد', 'تریلیون', 'کوادریلیون'];
+const teens = ['ده','یازده','دوازده','سیزده','چهارده','پانزده','شانزده','هفده','هجده','نوزده'];
+const hundreds = ['','صد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
+const scales = ['','هزار','میلیون','میلیارد','تریلیون','کوادریلیون'];
 
 function numberToWords(numStr) {
     if (numStr === '0') return 'صفر';
-    let words = '';
-    let scaleIndex = 0;
+    let words = '', scaleIndex = 0;
     for (let i = numStr.length; i > 0; i -= 3) {
-        const start = Math.max(0, i - 3);
-        const chunk = parseInt(numStr.substring(start, i), 10);
+        const start = Math.max(0, i-3);
+        const chunk = parseInt(numStr.substring(start,i),10);
         if (chunk !== 0) {
-            const chunkWords = convertChunkToWords(chunk);
-            words = chunkWords + (scaleIndex > 0 ? ' ' + scales[scaleIndex] : '') + 
-                   (words ? ' و ' + words : '');
+            const cw = convertChunkToWords(chunk);
+            words = cw + (scaleIndex>0 ? ' ' + scales[scaleIndex] : '') + (words ? ' و ' + words : '');
         }
         scaleIndex++;
     }
     return words;
 }
-
 function convertChunkToWords(chunk) {
     let result = '';
-    const hundred = Math.floor(chunk / 100);
-    if (hundred > 0) {
-        result += hundreds[hundred];
-    }
+    const hundred = Math.floor(chunk/100);
+    if (hundred>0) result += hundreds[hundred];
     const remainder = chunk % 100;
-    if (remainder > 0) {
-        if (result.length > 0) result += ' و ';
-        if (remainder < 10) {
-            result += units[remainder];
-        } else if (remainder < 20) {
-            result += teens[remainder - 10];
-        } else {
-            const ten = Math.floor(remainder / 10);
-            const unit = remainder % 10;
+    if (remainder>0) {
+        if (result.length>0) result += ' و ';
+        if (remainder < 10) result += units[remainder];
+        else if (remainder < 20) result += teens[remainder - 10];
+        else {
+            const ten = Math.floor(remainder/10), unit = remainder%10;
             result += tens[ten];
-            if (unit > 0) {
-                result += ' و ' + units[unit];
-            }
+            if (unit>0) result += ' و ' + units[unit];
         }
     }
     return result;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOMContentLoaded: صفحه بارگذاری شد');
-    
-    activeTab = 'gold-section';
-    
-    document.getElementById('retry-btn')?.addEventListener('click', loadAllData);
-    
-    document.getElementById('currency-search')?.addEventListener('input', function() {
-        const searchTerm = this.value.trim().toLowerCase();
-        const items = document.querySelectorAll('#currency-items .currency-item');
-        
-        items.forEach(item => {
-            const name = item.querySelector('.currency-name').textContent.toLowerCase();
-            if (name.includes(searchTerm)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+// --- ناوبری و شروع ---
+function navigateTo(targetSection) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(targetSection)?.classList.remove('hidden');
+    if (targetSection === 'currency-page') loadAllData();
+}
+document.getElementById('goto-converter')?.addEventListener('click', () => navigateTo('converter-page'));
+document.getElementById('goto-currency')?.addEventListener('click', () => navigateTo('currency-page'));
+document.querySelectorAll('.back-button').forEach(btn => btn.addEventListener('click', function() {
+    const t = this.getAttribute('data-target') || this.dataset.target;
+    if (t) navigateTo(t);
+}));
+
+// tab buttons: update to call showLoading with section
+document.querySelectorAll('.tab-btn').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        if (!target) return;
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.currency-section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(target)?.classList.remove('hidden');
+        activeTab = target;
+        showLoading(activeTab);
+        if (target === 'gold-section') loadGoldData();
+        else if (target === 'currency-section') loadCurrencyData();
+        else if (target === 'crypto-section') loadCryptoData();
     });
 });
 
-window.addEventListener('load', function() {
-    console.log('🚀 Window loaded: پنجره بارگذاری شد');
+// retry
+document.getElementById('retry-btn')?.addEventListener('click', loadAllData);
+
+// search handlers
+document.getElementById('currency-search')?.addEventListener('input', function() {
+    const term = this.value.trim().toLowerCase();
+    const items = document.querySelectorAll('#currency-items .currency-item');
+    items.forEach(item => {
+        const name = item.querySelector('.currency-name')?.textContent.toLowerCase() || '';
+        item.style.display = name.includes(term) ? 'flex' : 'none';
+    });
 });
 
+// startup
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded');
+    activeTab = 'gold-section';
+    // Note: main menu shown by default. When user opens currency page, loadAllData will run.
+});
+
+// ensure overlay hidden on initial load
+window.addEventListener('load', function() {
+    console.log('window loaded');
+    // hide overlay just in case
+    setTimeout(() => {
+        try { hideLoading(); } catch (e) { /* ignore */ }
+    }, 200);
+});
+
+// Telegram WebApp integration
 if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.expand();
-    window.Telegram.WebApp.ready();
-    
-    if (window.Telegram.WebApp.onEvent) {
-        window.Telegram.WebApp.onEvent('themeChanged', setThemeByTelegram);
+    try {
+        window.Telegram.WebApp.expand();
+        window.Telegram.WebApp.ready();
+        if (window.Telegram.WebApp.onEvent) {
+            window.Telegram.WebApp.onEvent('themeChanged', setThemeByTelegram);
+        }
+    } catch (e) {
+        console.warn('Telegram WebApp integration error:', e);
     }
 }
