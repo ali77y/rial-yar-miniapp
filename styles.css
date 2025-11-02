@@ -83,7 +83,7 @@ body {
     position: relative;
 }
 
-/* سیستم loading جدید با blur */
+/* سیستم loading جدید با blur و پشتیبانی از رنگ برای هر تب */
 .loading-overlay {
     position: absolute;
     top: 0;
@@ -100,6 +100,7 @@ body {
     z-index: 1000;
     opacity: 1;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: auto;
 }
 
 .loading-overlay.hidden {
@@ -111,8 +112,8 @@ body {
 .loading-overlay .loading-spinner {
     width: 60px;
     height: 60px;
-    border: 4px solid rgba(46, 125, 50, 0.2);
-    border-top-color: #2E7D32;
+    border: 4px solid rgba(0,0,0,0.06);
+    border-top-color: #1976D2; /* default blue for crypto */
     border-radius: 50%;
     animation: spin 1s infinite linear;
     margin-bottom: 20px;
@@ -125,6 +126,40 @@ body {
     font-family: 'BTitr', 'IRANSans', Tahoma, Arial, sans-serif;
 }
 
+/* overlay variants: gold, forex (green), crypto (blue) */
+.loading-overlay.overlay-gold {
+    background: rgba(255, 255, 240, 0.92);
+}
+.loading-overlay.overlay-gold .loading-spinner {
+    border: 4px solid rgba(255, 215, 0, 0.18);
+    border-top-color: #FFD700;
+}
+.loading-overlay.overlay-gold p {
+    color: #6b4a00;
+}
+
+.loading-overlay.overlay-forex {
+    background: rgba(240, 255, 245, 0.92);
+}
+.loading-overlay.overlay-forex .loading-spinner {
+    border: 4px solid rgba(76, 175, 80, 0.18);
+    border-top-color: #4CAF50;
+}
+.loading-overlay.overlay-forex p {
+    color: #1b5e20;
+}
+
+.loading-overlay.overlay-crypto {
+    background: rgba(240, 245, 255, 0.92);
+}
+.loading-overlay.overlay-crypto .loading-spinner {
+    border: 4px solid rgba(25, 118, 210, 0.12);
+    border-top-color: #1976D2;
+}
+.loading-overlay.overlay-crypto p {
+    color: #0d47a1;
+}
+
 /* حذف loading های قدیمی */
 .loading-container {
     display: none !important;
@@ -134,13 +169,38 @@ body.dark .loading-overlay {
     background: rgba(30, 30, 30, 0.95);
 }
 
-body.dark .loading-overlay p {
-    color: #4CAF50;
+/* dark mode colours for overlays */
+body.dark .loading-overlay.overlay-gold {
+    background: rgba(40, 30, 0, 0.75);
+}
+body.dark .loading-overlay.overlay-gold .loading-spinner {
+    border: 4px solid rgba(255, 215, 0, 0.12);
+    border-top-color: #FFD700;
+}
+body.dark .loading-overlay.overlay-gold p {
+    color: #FFD700;
 }
 
-body.dark .loading-overlay .loading-spinner {
-    border: 4px solid rgba(76, 175, 80, 0.2);
+body.dark .loading-overlay.overlay-forex {
+    background: rgba(0, 40, 0, 0.75);
+}
+body.dark .loading-overlay.overlay-forex .loading-spinner {
+    border: 4px solid rgba(76, 175, 80, 0.12);
     border-top-color: #4CAF50;
+}
+body.dark .loading-overlay.overlay-forex p {
+    color: #81C784;
+}
+
+body.dark .loading-overlay.overlay-crypto {
+    background: rgba(6, 10, 30, 0.85);
+}
+body.dark .loading-overlay.overlay-crypto .loading-spinner {
+    border: 4px solid rgba(25, 118, 210, 0.12);
+    border-top-color: #1976D2;
+}
+body.dark .loading-overlay.overlay-crypto p {
+    color: #90CAF9;
 }
 
 header {
