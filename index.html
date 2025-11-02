@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-    <title>ریال یار - قیمت طلا و ارز</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>ریال یار - تبدیل ریال، تومان و قیمت ارز</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/iran-sans-font@master/dist/IRANSansWeb.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -14,40 +14,33 @@
             <!-- Loading Overlay جدید -->
             <div id="loading-overlay" class="loading-overlay hidden">
                 <div class="loading-spinner"></div>
-                <p id="loading-text">در حال دریافت قیمت‌ها...</p>
+                <p>در حال دریافت قیمت‌ها...</p>
             </div>
 
             <header>
-                <div class="header-left">
-                    <button id="theme-toggle" class="theme-btn" aria-label="تغییر حالت">
-                        <span class="icon-wrapper">
-                            <span class="icon-moon">
-                                <svg width="28" height="28" viewBox="0 0 28 28">
-                                    <path d="M20 14c0 5-4 9-9 9-1.8 0-3.5-.5-5-1.4 6.2-1.8 10.3-8.1 8.8-14.5C16.4 7.5 20 10.5 20 14z" fill="#222"/>
-                                </svg>
-                            </span>
-                            <span class="icon-sun">
-                                <svg width="28" height="28" viewBox="0 0 28 28">
-                                    <circle cx="14" cy="14" r="7" fill="#ffe066"/>
-                                    <g stroke="#ffd700" stroke-width="2">
-                                        <line x1="14" y1="2" x2="14" y2="6"/>
-                                        <line x1="14" y1="22" x2="14" y2="26"/>
-                                        <line x1="2" y1="14" x2="6" y2="14"/>
-                                        <line x1="22" y1="14" x2="26" y2="14"/>
-                                    </g>
-                                </svg>
-                            </span>
+                <div class="header-placeholder"></div>
+                <button id="theme-toggle" class="theme-btn" aria-label="تغییر حالت">
+                    <span class="icon-wrapper">
+                        <span class="icon-moon">
+                            <svg width="28" height="28" viewBox="0 0 28 28">
+                                <path d="M20 14c0 5-4 9-9 9-1.8 0-3.5-.5-5-1.4 6.2-1.8 10.3-8.1 8.8-14.5C16.4 7.5 20 10.5 20 14z" fill="#222"/>
+                            </svg>
                         </span>
-                    </button>
-                </div>
-
-                <div class="header-center">
-                    <h1>قیمت طلا و ارز</h1>
-                </div>
-
-                <div class="header-right header-placeholder"></div>
+                        <span class="icon-sun">
+                            <svg width="28" height="28" viewBox="0 0 28 28">
+                                <circle cx="14" cy="14" r="7" fill="#ffe066"/>
+                                <g stroke="#ffd700" stroke-width="2">
+                                    <line x1="14" y1="2" x2="14" y2="6"/>
+                                    <line x1="14" y1="22" x2="14" y2="26"/>
+                                    <line x1="2" y1="14" x2="6" y2="14"/>
+                                    <line x1="22" y1="14" x2="26" y2="14"/>
+                                </g>
+                            </svg>
+                        </span>
+                    </span>
+                </button>
             </header>
-
+            
             <!-- منوی اصلی -->
             <div id="main-menu" class="page-section">
                 <div class="logo-container">
@@ -55,10 +48,11 @@
                         <img src="https://i.imgur.com/l72piSO.png" alt="ریال یار" class="logo-light logo-dark" draggable="false">
                     </div>
                     <div class="app-description">
-                        <p>ابزار تبدیل ریال و تومان و نمایش قیمت‌های لحظه‌ای</p>
+                        <p>ابزار تبدیل ریال به تومان و بالعکس</p>
+                        <p>نمایش آخرین قیمت‌های ارز، طلا و ارزهای دیجیتال</p>
                     </div>
                 </div>
-
+                
                 <div class="menu-options">
                     <button id="goto-converter" class="menu-option">
                         <i class="material-icons">autorenew</i>
@@ -70,7 +64,7 @@
                     </button>
                 </div>
             </div>
-
+            
             <!-- بخش تبدیل ریال به تومان -->
             <div id="converter-page" class="page-section hidden">
                 <div class="page-header">
@@ -79,11 +73,11 @@
                     </button>
                     <h2>تبدیل ریال و تومان</h2>
                 </div>
-
+                
                 <div class="info-box">
-                    <p>برای تبدیل تومان به ریال یا تبدیل ریال به تومان عدد را وارد کنید.</p>
+                    <p>برای تبدیل تومان به ریال یا تبدیل ریال به تومان بعد از انتخاب نوع تبدیل عدد مربوطه وارد کنید.</p>
                 </div>
-
+                
                 <div class="form-container">
                     <div class="form-group">
                         <label for="conversion-type">نوع تبدیل:</label>
@@ -92,17 +86,17 @@
                             <option value="rial-to-toman">ریال به تومان</option>
                         </select>
                     </div>
-
+                    
                     <div class="form-group">
                         <label id="amount-label">مبلغ را به تومان وارد کنید:</label>
-                        <input type="text" id="amount" placeholder="مثال: 50000" dir="ltr">
+                        <input type="text" id="amount" placeholder="به طور مثال: 50000" dir="ltr">
                     </div>
-
+                    
                     <button id="convert-btn" class="btn primary-btn">
                         <i class="material-icons btn-icon">autorenew</i> تبدیل
                     </button>
                 </div>
-
+                
                 <div id="result-container" class="result-container hidden">
                     <div class="result-group">
                         <div class="result-header">
@@ -113,7 +107,7 @@
                         </div>
                         <button id="copy-numeric" class="btn secondary-btn">کپی</button>
                     </div>
-
+                    
                     <div class="result-group">
                         <div class="result-header">
                             <h3>نتیجه به حروف</h3>
@@ -125,39 +119,29 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- بخش قیمت طلا و ارز -->
             <div id="currency-page" class="page-section hidden">
-                <div class="mini-info">
-                    <div class="mini-left">
-                        <span class="mini-title">ریال یار</span>
-                        <span class="mini-desc">قیمت‌های لحظه‌ای طلا و ارز</span>
-                    </div>
-                    <div class="mini-right">
-                        <span id="update-time">آخرین به‌روزرسانی: --/--/---- ساعت --:--</span>
-                    </div>
-                </div>
-
-                <div class="page-header small">
+                <div class="page-header">
                     <button class="back-button" data-target="main-menu">
                         <i class="material-icons">arrow_forward</i>
                     </button>
                     <h2>قیمت طلا و ارز</h2>
                 </div>
-
+                
                 <div class="currency-tabs">
                     <button class="tab-btn active tab-gold" data-target="gold-section">طلا و سکه</button>
                     <button class="tab-btn tab-forex" data-target="currency-section">ارزهای خارجی</button>
                     <button class="tab-btn tab-crypto" data-target="crypto-section">ارزهای دیجیتال</button>
                 </div>
-
+                
                 <!-- بخش طلا و سکه -->
                 <div id="gold-section" class="currency-section">
                     <div class="currency-items" id="gold-items">
                         <!-- این بخش با JavaScript پر می‌شود -->
                     </div>
                 </div>
-
+                
                 <!-- بخش ارزهای خارجی -->
                 <div id="currency-section" class="currency-section hidden">
                     <div class="search-container">
@@ -168,7 +152,7 @@
                         <!-- این بخش با JavaScript پر می‌شود -->
                     </div>
                 </div>
-
+                
                 <!-- بخش ارزهای دیجیتال -->
                 <div id="crypto-section" class="currency-section hidden">
                     <div class="search-container">
@@ -179,21 +163,25 @@
                         <!-- این بخش با JavaScript پر می‌شود -->
                     </div>
                 </div>
-
+                
                 <div id="currency-error" class="error-container hidden">
                     <i class="material-icons error-icon">error_outline</i>
                     <p>خطا در دریافت اطلاعات</p>
                     <button id="retry-btn" class="btn primary-btn sm">تلاش مجدد</button>
                 </div>
+                
+                <div class="update-info">
+                    <i class="material-icons update-icon">update</i>
+                    <span id="update-time">آخرین به‌روزرسانی: --/--/---- ساعت --:--</span>
+                </div>
             </div>
         </div>
     </div>
-
     <script src="script.js"></script>
     <script>
-        document.fonts.ready.then(() => {
-            document.body.style.opacity = '1';
-        });
+    document.fonts.ready.then(() => {
+        document.body.style.opacity = '1';
+    });
     </script>
 </body>
 </html>
